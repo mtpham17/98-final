@@ -1,0 +1,43 @@
+---
+title: "Final Project EDA"
+output: html_notebook
+---
+
+```{r}
+library(dplyr)
+data <- read.csv('data/immigration_policies/policy_list.csv')
+# summary(data)
+```
+
+```{r}
+colSums(is.na(data))[colSums(is.na(data)) != 0]
+
+mod_df <- data.frame(data)
+
+# dropping columns that will not affect our data analysis in any way
+mod_df <- select(mod_df, -c('SOURCE_QUALITY':'OLD_ID'))
+colSums(is.na(mod_df))[colSums(is.na(mod_df)) != 0]
+colSums(is.na(mod_df))[colSums(is.na(mod_df)) == 0]
+```
+
+```{r}
+# tables to summarize data
+
+for (i in 1:length(colnames(mod_df))) {
+  column = colnames(mod_df)[i]
+  if (class(mod_df[, column]) == "integer") {
+    print(column)
+    print(table(mod_df[, column]))
+  }
+}
+```
+
+```{r}
+# some data cleaning -- how can we still use the 
+```
+
+```{r}
+# aggregating by country -- hopefully NA will not create an issue now
+```
+
+
