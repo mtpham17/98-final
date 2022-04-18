@@ -8,6 +8,7 @@ output: html_notebook
 library(mltools)
 library(data.table)
 library(dplyr)
+library(stringr)
 ```
 
 ```{r}
@@ -48,10 +49,13 @@ for (i in 1:length(colnames(mod_df))) {
 
 
 we know that there are 1762 observations total. we substitute out visa_ban (0 or 1 values)
-with visa_ban_type, which encapsulates all, specific, or none -- we will need to one-hot encode this! other ones I am interested in are history_ban_list and either citizen_list or citizen_list (it seems like these two would be closely linked). If I use these, then eliminate history_ban and citizen/citizen_excep from consideration (these are values that don't have N/As)
+with visa_ban_type, which encapsulates all, specific, or none -- we will need to one-hot encode this! other ones to explore: history_ban_list and citizen_list. If I use these, then eliminate history_ban and citizen from consideration (these are values that don't have N/As)
 
 ```{r}
 # data cleaning for NA values
+
+## VISA_BAN_LIST
+
 colSums(is.na(mod_df))[colSums(is.na(mod_df)) != 0]
 
 mod_df$VISA_BAN_NONE <- rep(0, nrow(mod_df))
@@ -64,17 +68,44 @@ mod_df[mod_df$VISA_BAN_TYPE == "All"
 mod_df$VISA_BAN_SPECIFIC <- rep(0, nrow(mod_df))
 mod_df[mod_df$VISA_BAN_TYPE == "specific" 
        & !is.na(mod_df$VISA_BAN_TYPE), ]$VISA_BAN_SPECIFIC <- 1
+
+```
+
+```{r}
+## HISTORY_BAN_LIST
+
+# for now, will count the number of commas
+# it would be interesting to explore whether certain countries are banned more often than others, but I feel like the variation is too large that this would not be a productive use of my time
+
+# helper function to determine the number of countries 
+# i.e., number of commas plus one
+
+country_counter <- function(obj) {
+  if (is.na(obj)) {
+    return(0)
+  }
+  return ((str_count(obj, ',')) + 1)
+}
+
+mod_df$HISTORY_BAN_CLEANED <- lapply(mod_df$HISTORY_BAN_LIST, country_counter)
+mod_df$CITIZEN_LIST_CLEANED <- lapply(mod_df$CITIZEN_LIST, country_counter)
+
+
+
+
 ```
 
 for clustering, will use 
 - policy_type, (maybe policy_subtype?) -- need to one-hot-encode
 - length of policy (end_date - start_date)
-- air, land, sea, possibly citizen/citizen_excep, refugee, visa_ban, country_excep, work_excep
+- air, land, sea, refugee, country_excep, work_excep
+- visa_ban, citizen_list, and history_ban are already covered by the ``list" values we are including
 
 
 ```{r}
 # data cleaning for non-NA values
 colSums(is.na(mod_df))[colSums(is.na(mod_df)) == 0]
+
 ```
 
 goals by next Wednesday:
