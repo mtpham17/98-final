@@ -98,6 +98,7 @@ for clustering, will use
 - visa_ban, citizen_list, and history_ban are already covered by the ``list" values we are including
 
 
+
 ```{r}
 # data cleaning for non-NA values
 colSums(is.na(mod_df))[colSums(is.na(mod_df)) == 0]
@@ -128,6 +129,19 @@ mod_df[mod_df$POLICY_TYPE == "PARTIAL", ]$POLICY_TYPE_CLEANED <- 1
 mod_df[mod_df$POLICY_TYPE == "COMPLETE", ]$POLICY_TYPE_CLEANED <- 2
 
 ```
+
+
+AT THIS POINT, WE ARE DONE WITH CLEANING. THESE ARE THE VARIABLE NAMES WE WANT TO USE:
+
+
+ones we've cleaned:
+
+
+VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL, HISTORY_BAN_CLEANED, CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_CLEANED
+
+ones we've left alone:
+
+AIR, LAND, SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP
 
 goals by next Wednesday:
 - kMeans cluster on selected variables
