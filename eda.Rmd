@@ -3,10 +3,17 @@ title: "Final Project EDA"
 output: html_notebook
 ---
 
+
 ```{r}
+library(mltools)
+library(data.table)
 library(dplyr)
+```
+
+```{r}
 data <- read.csv('data/immigration_policies/policy_list.csv')
 # summary(data)
+
 ```
 
 ```{r}
@@ -22,22 +29,60 @@ colSums(is.na(mod_df))[colSums(is.na(mod_df)) == 0]
 
 ```{r}
 # tables to summarize data
+# find twelve variables that most interested in, and do correlatin matrix
+# if certain variables are very highly correlated, then only use one of the two
+
+# geom jitter -- points won't be laying on top of each other
 
 for (i in 1:length(colnames(mod_df))) {
   column = colnames(mod_df)[i]
-  if (class(mod_df[, column]) == "integer") {
-    print(column)
-    print(table(mod_df[, column]))
+  if (sum(is.na(mod_df[, column])) == 0) {
+    if (!(column %in% c("ID", "COUNTRY_NAME", "ISO2", "ID", "START_DATE", 
+                        "END_DATE", "ISO3"))) {
+      print(column)
+      print(table(mod_df[, column]))
+    }
   }
 }
 ```
 
-```{r}
-# some data cleaning -- how can we still use the 
-```
+
+we know that there are 1762 observations total. we substitute out visa_ban (0 or 1 values)
+with visa_ban_type, which encapsulates all, specific, or none -- we will need to one-hot encode this! other ones I am interested in are history_ban_list and either citizen_list or citizen_list (it seems like these two would be closely linked). If I use these, then eliminate history_ban and citizen/citizen_excep from consideration (these are values that don't have N/As)
 
 ```{r}
-# aggregating by country -- hopefully NA will not create an issue now
+# data cleaning for NA values
+colSums(is.na(mod_df))[colSums(is.na(mod_df)) != 0]
+
+mod_df$VISA_BAN_NONE <- rep(0, nrow(mod_df))
+mod_df[is.na(mod_df$VISA_BAN_TYPE), ]$VISA_BAN_NONE <- 1
+
+mod_df$VISA_BAN_ALL <- rep(0, nrow(mod_df))
+mod_df[mod_df$VISA_BAN_TYPE == "All" 
+       & !is.na(mod_df$VISA_BAN_TYPE), ]$VISA_BAN_ALL <- 1
+
+mod_df$VISA_BAN_SPECIFIC <- rep(0, nrow(mod_df))
+mod_df[mod_df$VISA_BAN_TYPE == "specific" 
+       & !is.na(mod_df$VISA_BAN_TYPE), ]$VISA_BAN_SPECIFIC <- 1
 ```
 
+for clustering, will use 
+- policy_type, (maybe policy_subtype?) -- need to one-hot-encode
+- length of policy (end_date - start_date)
+- air, land, sea, possibly citizen/citizen_excep, refugee, visa_ban, country_excep, work_excep
 
+
+```{r}
+# data cleaning for non-NA values
+colSums(is.na(mod_df))[colSums(is.na(mod_df)) == 0]
+```
+
+goals by next Wednesday:
+- kMeans cluster on selected variables
+- hierarchical cluster 
+- (not needed by next Wednesday, but we can vary the number of clusters and where you stop on the dendrogram) -- can talk about this as next steps
+- plot two variables from demographics -- then plot the clusters we previously generated (for immigration policies) -- this can be a wednesday goal!
+- can also run the cluster algorithm on the demographics data -- does not need to be a wednesday goal
+- WorldBank, Gap Minder (may have an R package!) -- other potential data sets for the demographic
+- try different distance metrics to see how much the answer changes (how robust is it to that choice?)
+- k-modes clustering -- better suited for categorical data

@@ -1755,47 +1755,42 @@ pre code {
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkcGx5cilcbmRhdGEgPC0gcmVhZC5jc3YoJ2RhdGEvaW1taWdyYXRpb25fcG9saWNpZXMvcG9saWN5X2xpc3QuY3N2JylcbiMgc3VtbWFyeShkYXRhKVxuY29sU3Vtcyhpcy5uYShkYXRhKSlbY29sU3Vtcyhpcy5uYShkYXRhKSkgIT0gMF1cbmBgYCJ9 -->
-<pre class="r"><code>library(dplyr)
-data &lt;- read.csv('data/immigration_policies/policy_list.csv')
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShtbHRvb2xzKVxuYGBgIn0= -->
+<pre class="r"><code>library(mltools)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUmVnaXN0ZXJlZCBTMyBtZXRob2Qgb3ZlcndyaXR0ZW4gYnkgJ2RhdGEudGFibGUnOlxuICBtZXRob2QgICAgICAgICAgIGZyb21cbiAgcHJpbnQuZGF0YS50YWJsZSAgICAgXG4ifQ== -->
+<pre><code>Registered S3 method overwritten by 'data.table':
+  method           from
+  print.data.table     </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkYXRhLnRhYmxlKVxuYGBgIn0= -->
+<pre class="r"><code>library(data.table)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiZGF0YS50YWJsZSAxLjE0LjIgdXNpbmcgMSB0aHJlYWRzIChzZWUgP2dldERUdGhyZWFkcykuICBMYXRlc3QgbmV3czogci1kYXRhdGFibGUuY29tXG4qKioqKioqKioqXG5UaGlzIGluc3RhbGxhdGlvbiBvZiBkYXRhLnRhYmxlIGhhcyBub3QgZGV0ZWN0ZWQgT3Blbk1QIHN1cHBvcnQuIEl0IHNob3VsZCBzdGlsbCB3b3JrIGJ1dCBpbiBzaW5nbGUtdGhyZWFkZWQgbW9kZS5cblRoaXMgaXMgYSBNYWMuIFBsZWFzZSByZWFkIGh0dHBzOi8vbWFjLnItcHJvamVjdC5vcmcvb3Blbm1wLy4gUGxlYXNlIGVuZ2FnZSB3aXRoIEFwcGxlIGFuZCBhc2sgdGhlbSBmb3Igc3VwcG9ydC4gQ2hlY2sgci1kYXRhdGFibGUuY29tIGZvciB1cGRhdGVzLCBhbmQgb3VyIE1hYyBpbnN0cnVjdGlvbnMgaGVyZTogaHR0cHM6Ly9naXRodWIuY29tL1JkYXRhdGFibGUvZGF0YS50YWJsZS93aWtpL0luc3RhbGxhdGlvbi4gQWZ0ZXIgc2V2ZXJhbCB5ZWFycyBvZiBtYW55IHJlcG9ydHMgb2YgaW5zdGFsbGF0aW9uIHByb2JsZW1zIG9uIE1hYywgaXQncyB0aW1lIHRvIGdpbmdlcmx5IHBvaW50IG91dCB0aGF0IHRoZXJlIGhhdmUgYmVlbiBubyBzaW1pbGFyIHByb2JsZW1zIG9uIFdpbmRvd3Mgb3IgTGludXguXG4qKioqKioqKioqXG5cbkF0dGFjaGluZyBwYWNrYWdlOiDigJhkYXRhLnRhYmxl4oCZXG5cblRoZSBmb2xsb3dpbmcgb2JqZWN0cyBhcmUgbWFza2VkIGZyb20g4oCYcGFja2FnZTpkcGx5cuKAmTpcblxuICAgIGJldHdlZW4sIGZpcnN0LCBsYXN0XG4ifQ== -->
+<pre><code>data.table 1.14.2 using 1 threads (see ?getDTthreads).  Latest news: r-datatable.com
+**********
+This installation of data.table has not detected OpenMP support. It should still work but in single-threaded mode.
+This is a Mac. Please read https://mac.r-project.org/openmp/. Please engage with Apple and ask them for support. Check r-datatable.com for updates, and our Mac instructions here: https://github.com/Rdatatable/data.table/wiki/Installation. After several years of many reports of installation problems on Mac, it's time to gingerly point out that there have been no similar problems on Windows or Linux.
+**********
+
+Attaching package: ‘data.table’
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, first, last</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkcGx5cilcbmBgYCJ9 -->
+<pre class="r"><code>library(dplyr)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YSA8LSByZWFkLmNzdignZGF0YS9pbW1pZ3JhdGlvbl9wb2xpY2llcy9wb2xpY3lfbGlzdC5jc3YnKVxuIyBzdW1tYXJ5KGRhdGEpXG5cbmBgYCJ9 -->
+<pre class="r"><code>data &lt;- read.csv('data/immigration_policies/policy_list.csv')
 # summary(data)
-colSums(is.na(data))[colSums(is.na(data)) != 0]</code></pre>
+</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgICBJU08yICAgICAgICAgICBBSVJfVFlQRSAgICAgICAgVEFSR0VUU19BSVIgICAgICAgICAgTEFORF9UWVBFIFxuICAgICAgICAgICAgICAgICA3ICAgICAgICAgICAgICAgMTA3MyAgICAgICAgICAgICAgIDExNjkgICAgICAgICAgICAgICAxNTExIFxuICAgICAgVEFSR0VUU19MQU5EICAgICAgICAgICBTRUFfVFlQRSAgICAgICAgVEFSR0VUU19TRUEgICAgICAgQ0lUSVpFTl9MSVNUIFxuICAgICAgICAgICAgICAxNTcxICAgICAgICAgICAgICAgMTUzNCAgICAgICAgICAgICAgIDE1NTQgICAgICAgICAgICAgICAxNTY4IFxuICBISVNUT1JZX0JBTl9MSVNUICAgICAgIFJFRlVHRUVfTElTVCAgICAgIFZJU0FfQkFOX1RZUEUgICAgICBWSVNBX0JBTl9MSVNUIFxuICAgICAgICAgICAgICAxNDkyICAgICAgICAgICAgICAgMTc2MCAgICAgICAgICAgICAgIDE2OTkgICAgICAgICAgICAgICAxNzQxIFxuQ0lUSVpFTl9FWENFUF9MSVNUIENPVU5UUllfRVhDRVBfTElTVCBcbiAgICAgICAgICAgICAgMTM5MCAgICAgICAgICAgICAgIDE2MjUgXG4ifQ== -->
-<pre><code>              ISO2           AIR_TYPE        TARGETS_AIR          LAND_TYPE 
-                 7               1073               1169               1511 
-      TARGETS_LAND           SEA_TYPE        TARGETS_SEA       CITIZEN_LIST 
-              1571               1534               1554               1568 
-  HISTORY_BAN_LIST       REFUGEE_LIST      VISA_BAN_TYPE      VISA_BAN_LIST 
-              1492               1760               1699               1741 
-CITIZEN_EXCEP_LIST COUNTRY_EXCEP_LIST 
-              1390               1625 </code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29sU3Vtcyhpcy5uYShkYXRhKSlbY29sU3Vtcyhpcy5uYShkYXRhKSkgPT0gMF1cbmBgYCJ9 -->
-<pre class="r"><code>colSums(is.na(data))[colSums(is.na(data)) == 0]</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgICAgICAgICBJRCAgICAgICAgICAgQ09VTlRSWV9OQU1FICAgICAgICAgICAgICAgICAgIElTTzMgXG4gICAgICAgICAgICAgICAgICAgICAwICAgICAgICAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgICAgICAgICAgMCBcbiAgICAgICAgICAgUE9MSUNZX1RZUEUgICAgICAgICBQT0xJQ1lfU1VCVFlQRSAgICAgICAgICAgICBTVEFSVF9EQVRFIFxuICAgICAgICAgICAgICAgICAgICAgMCAgICAgICAgICAgICAgICAgICAgICAwICAgICAgICAgICAgICAgICAgICAgIDAgXG4gICAgICAgICAgICAgIEVORF9EQVRFICAgICAgICAgICAgICAgICAgICBBSVIgICAgICAgICAgICAgICAgICAgTEFORCBcbiAgICAgICAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgICAgICAgICAgMCAgICAgICAgICAgICAgICAgICAgICAwIFxuICAgICAgICAgICAgICAgICAgIFNFQSAgICAgICAgICAgICAgICBDSVRJWkVOICAgICAgICAgICAgSElTVE9SWV9CQU4gXG4gICAgICAgICAgICAgICAgICAgICAwICAgICAgICAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgICAgICAgICAgMCBcbiAgICAgICAgICAgICAgIFJFRlVHRUUgICAgICAgICAgICAgICBWSVNBX0JBTiAgICAgICAgICBDSVRJWkVOX0VYQ0VQIFxuICAgICAgICAgICAgICAgICAgICAgMCAgICAgICAgICAgICAgICAgICAgICAwICAgICAgICAgICAgICAgICAgICAgIDAgXG4gICAgICAgICBDT1VOVFJZX0VYQ0VQICAgICAgICAgICAgIFdPUktfRVhDRVAgICAgICAgICBTT1VSQ0VfUVVBTElUWSBcbiAgICAgICAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgICAgICAgICAgMCAgICAgICAgICAgICAgICAgICAgICAwIFxuICAgICAgICAgICBTT1VSQ0VfVFlQRSAgIElOVEVSTkFMX0dPVlRfU09VUkNFICAgICAgICAgQUlSTElORV9TT1VSQ0UgXG4gICAgICAgICAgICAgICAgICAgICAwICAgICAgICAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgICAgICAgICAgMCBcbiAgICAgIElOU1VSQU5DRV9TT1VSQ0UgR09WVF9TT0NJQUxfTUVEX1NPVVJDRSAgICAgICAgRVhUX0dPVlRfU09VUkNFIFxuICAgICAgICAgICAgICAgICAgICAgMCAgICAgICAgICAgICAgICAgICAgICAwICAgICAgICAgICAgICAgICAgICAgIDAgXG4gSU5URVJOQUxfTUVESUFfU09VUkNFICAgICAgIEVYVF9NRURJQV9TT1VSQ0UgICAgICAgICAgIE9USEVSX1NPVVJDRSBcbiAgICAgICAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgICAgICAgICAgMCAgICAgICAgICAgICAgICAgICAgICAwIFxuICAgICAgICAgICAgRU5EX1NPVVJDRSAgICAgICAgICAgICAgIENPTU1FTlRTICAgICAgICAgICAgICAgICBPTERfSUQgXG4gICAgICAgICAgICAgICAgICAgICAwICAgICAgICAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgICAgICAgICAgMCBcbiJ9 -->
-<pre><code>                    ID           COUNTRY_NAME                   ISO3 
-                     0                      0                      0 
-           POLICY_TYPE         POLICY_SUBTYPE             START_DATE 
-                     0                      0                      0 
-              END_DATE                    AIR                   LAND 
-                     0                      0                      0 
-                   SEA                CITIZEN            HISTORY_BAN 
-                     0                      0                      0 
-               REFUGEE               VISA_BAN          CITIZEN_EXCEP 
-                     0                      0                      0 
-         COUNTRY_EXCEP             WORK_EXCEP         SOURCE_QUALITY 
-                     0                      0                      0 
-           SOURCE_TYPE   INTERNAL_GOVT_SOURCE         AIRLINE_SOURCE 
-                     0                      0                      0 
-      INSURANCE_SOURCE GOVT_SOCIAL_MED_SOURCE        EXT_GOVT_SOURCE 
-                     0                      0                      0 
- INTERNAL_MEDIA_SOURCE       EXT_MEDIA_SOURCE           OTHER_SOURCE 
-                     0                      0                      0 
-            END_SOURCE               COMMENTS                 OLD_ID 
-                     0                      0                      0 </code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
@@ -1813,88 +1808,175 @@ CITIZEN_EXCEP_LIST COUNTRY_EXCEP_LIST
 CITIZEN_EXCEP_LIST COUNTRY_EXCEP_LIST 
               1390               1625 </code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kX2RmIDwtIGRhdGEuZnJhbWUoZGF0YSlcblxuIyBkcm9wcGluZyBjb2x1bW5zIHRoYXQgd2lsbCBub3QgYWZmZWN0IG91ciBkYXRhIGFuYWx5c2lzIGluIGFueSB3YXlcbm1vZF9kZiA8LSBzZWxlY3QobW9kX2RmLCAtYygnU09VUkNFX1FVQUxJVFknOidPTERfSUQnKSlcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kX2RmIDwtIGRhdGEuZnJhbWUoZGF0YSlcblxuIyBkcm9wcGluZyBjb2x1bW5zIHRoYXQgd2lsbCBub3QgYWZmZWN0IG91ciBkYXRhIGFuYWx5c2lzIGluIGFueSB3YXlcbm1vZF9kZiA8LSBzZWxlY3QobW9kX2RmLCAtYygnU09VUkNFX1FVQUxJVFknOidPTERfSUQnKSlcbmNvbFN1bXMoaXMubmEobW9kX2RmKSlbY29sU3Vtcyhpcy5uYShtb2RfZGYpKSAhPSAwXVxuYGBgIn0= -->
 <pre class="r"><code>mod_df &lt;- data.frame(data)
 
 # dropping columns that will not affect our data analysis in any way
-mod_df &lt;- select(mod_df, -c('SOURCE_QUALITY':'OLD_ID'))</code></pre>
+mod_df &lt;- select(mod_df, -c('SOURCE_QUALITY':'OLD_ID'))
+colSums(is.na(mod_df))[colSums(is.na(mod_df)) != 0]</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgICBJU08yICAgICAgICAgICBBSVJfVFlQRSAgICAgICAgVEFSR0VUU19BSVIgICAgICAgICAgTEFORF9UWVBFIFxuICAgICAgICAgICAgICAgICA3ICAgICAgICAgICAgICAgMTA3MyAgICAgICAgICAgICAgIDExNjkgICAgICAgICAgICAgICAxNTExIFxuICAgICAgVEFSR0VUU19MQU5EICAgICAgICAgICBTRUFfVFlQRSAgICAgICAgVEFSR0VUU19TRUEgICAgICAgQ0lUSVpFTl9MSVNUIFxuICAgICAgICAgICAgICAxNTcxICAgICAgICAgICAgICAgMTUzNCAgICAgICAgICAgICAgIDE1NTQgICAgICAgICAgICAgICAxNTY4IFxuICBISVNUT1JZX0JBTl9MSVNUICAgICAgIFJFRlVHRUVfTElTVCAgICAgIFZJU0FfQkFOX1RZUEUgICAgICBWSVNBX0JBTl9MSVNUIFxuICAgICAgICAgICAgICAxNDkyICAgICAgICAgICAgICAgMTc2MCAgICAgICAgICAgICAgIDE2OTkgICAgICAgICAgICAgICAxNzQxIFxuQ0lUSVpFTl9FWENFUF9MSVNUIENPVU5UUllfRVhDRVBfTElTVCBcbiAgICAgICAgICAgICAgMTM5MCAgICAgICAgICAgICAgIDE2MjUgXG4ifQ== -->
+<pre><code>              ISO2           AIR_TYPE        TARGETS_AIR          LAND_TYPE 
+                 7               1073               1169               1511 
+      TARGETS_LAND           SEA_TYPE        TARGETS_SEA       CITIZEN_LIST 
+              1571               1534               1554               1568 
+  HISTORY_BAN_LIST       REFUGEE_LIST      VISA_BAN_TYPE      VISA_BAN_LIST 
+              1492               1760               1699               1741 
+CITIZEN_EXCEP_LIST COUNTRY_EXCEP_LIST 
+              1390               1625 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29sU3Vtcyhpcy5uYShtb2RfZGYpKVtjb2xTdW1zKGlzLm5hKG1vZF9kZikpID09IDBdXG5gYGAifQ== -->
+<pre class="r"><code>colSums(is.na(mod_df))[colSums(is.na(mod_df)) == 0]</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgSUQgICBDT1VOVFJZX05BTUUgICAgICAgICAgIElTTzMgICAgUE9MSUNZX1RZUEUgUE9MSUNZX1NVQlRZUEUgICAgIFNUQVJUX0RBVEUgXG4gICAgICAgICAgICAgMCAgICAgICAgICAgICAgMCAgICAgICAgICAgICAgMCAgICAgICAgICAgICAgMCAgICAgICAgICAgICAgMCAgICAgICAgICAgICAgMCBcbiAgICAgIEVORF9EQVRFICAgICAgICAgICAgQUlSICAgICAgICAgICBMQU5EICAgICAgICAgICAgU0VBICAgICAgICBDSVRJWkVOICAgIEhJU1RPUllfQkFOIFxuICAgICAgICAgICAgIDAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgIDAgXG4gICAgICAgUkVGVUdFRSAgICAgICBWSVNBX0JBTiAgQ0lUSVpFTl9FWENFUCAgQ09VTlRSWV9FWENFUCAgICAgV09SS19FWENFUCBcbiAgICAgICAgICAgICAwICAgICAgICAgICAgICAwICAgICAgICAgICAgICAwICAgICAgICAgICAgICAwICAgICAgICAgICAgICAwIFxuIn0= -->
+<pre><code>            ID   COUNTRY_NAME           ISO3    POLICY_TYPE POLICY_SUBTYPE     START_DATE 
+             0              0              0              0              0              0 
+      END_DATE            AIR           LAND            SEA        CITIZEN    HISTORY_BAN 
+             0              0              0              0              0              0 
+       REFUGEE       VISA_BAN  CITIZEN_EXCEP  COUNTRY_EXCEP     WORK_EXCEP 
+             0              0              0              0              0 </code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyB0YWJsZXMgdG8gc3VtbWFyaXplIGRhdGFcblxuZm9yIChpIGluIDE6bGVuZ3RoKGNvbG5hbWVzKG1vZF9kZikpKSB7XG4gIGNvbHVtbiA9IGNvbG5hbWVzKG1vZF9kZilbaV1cbiAgaWYgKGNsYXNzKG1vZF9kZlssIGNvbHVtbl0pID09IFwiaW50ZWdlclwiKSB7XG4gICAgcHJpbnQoY29sdW1uKVxuICAgIHByaW50KHRhYmxlKG1vZF9kZlssIGNvbHVtbl0pKVxuICB9XG59XG5gYGAifQ== -->
-<pre class="r"><code># tables to summarize data
-
-for (i in 1:length(colnames(mod_df))) {
-  column = colnames(mod_df)[i]
-  if (class(mod_df[, column]) == &quot;integer&quot;) {
-    print(column)
-    print(table(mod_df[, column]))
-  }
-}</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyB0YWJsZXMgdG8gc3VtbWFyaXplIGRhdGFcblxuZm9yIChpIGluIDE6bGVuZ3RoKGNvbG5hbWVzKG1vZF9kZikpKSB7XG4gIGNvbHVtbiA9IGNvbG5hbWVzKG1vZF9kZilbaV1cbiAgaWYgKHN1bShpcy5uYShtb2RfZGZbLCBjb2x1bW5dKSkgPT0gMCkge1xuICAgIGlmICghKGNvbHVtbiAlaW4lIGMoXFxJRFxcLCBcXENPVU5UUllfTkFNRVxcLCBcXElTTzJcXCwgXFxJRFxcLCBcXFNUQVJUX0RBVEVcXCwgXFxFTkRfREFURVxcKSkpIHtcbiAgICAgIHByaW50KGNvbHVtbilcbiAgICAgIHByaW50KHRhYmxlKG1vZF9kZlssIGNvbHVtbl0pKVxuICAgIH1cbiAgfVxufVxuYGBgXG5gYGAifQ== -->
+<p><code>r</code>r # tables to summarize data</p>
+<p>for (i in 1:length(colnames(mod_df))) { column = colnames(mod_df)[i] if (sum(is.na(mod_df[, column])) == 0) { if (!(column %in% c(, _NAME, 2, , _DATE, _DATE))) { print(column) print(table(mod_df[, column])) } } }</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQUlSXCJcblxuICAgMCAgICAxIFxuMTA3MyAgNjg5IFxuWzFdIFwiTEFORFwiXG5cbiAgIDAgICAgMSBcbjE1MTEgIDI1MSBcblsxXSBcIlNFQVwiXG5cbiAgIDAgICAgMSBcbjE1MzQgIDIyOCBcblsxXSBcIkNJVElaRU5cIlxuXG4gICAwICAgIDEgXG4xNTY4ICAxOTQgXG5bMV0gXCJISVNUT1JZX0JBTlwiXG5cbiAgIDAgICAgMSBcbjE0OTIgIDI3MCBcblsxXSBcIlJFRlVHRUVcIlxuXG4gICAwICAgIDEgXG4xNzU5ICAgIDMgXG5bMV0gXCJWSVNBX0JBTlwiXG5cbiAgIDAgICAgMSBcbjE2OTkgICA2MyBcblsxXSBcIkNJVElaRU5fRVhDRVBcIlxuXG4gICAwICAgIDEgXG4xMzkwICAzNzIgXG5bMV0gXCJDT1VOVFJZX0VYQ0VQXCJcblxuICAgMCAgICAxIFxuMTYyNSAgMTM3IFxuWzFdIFwiV09SS19FWENFUFwiXG5cbiAgIDAgICAgMSBcbjE2MzIgIDEzMCBcbiJ9 -->
-<pre><code>[1] &quot;AIR&quot;
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFxcSVNPM1xcXG5cbkFCVyBBRkcgQUdPIEFJQSBBTEEgQUxCIEFORCBBUkUgQVJHIEFSTSBBU00gQVRBIEFURyBBVVMgQVVUIEFaRSBCREkgQkVMIEJFTiBCRVMgQkZBIEJHRCBcbiAgOSAgIDQgICA3ICAgMyAgMTcgICA5ICAgMSAgMTAgICA3ICAgNCAgMTggICAxICAgOSAgIDcgIDI5ICAxMCAgIDQgIDIxICAgMyAgIDkgICAyICAgNyBcbkJHUiBCSFIgQkhTIEJJSCBCTE0gQkxSIEJMWiBCTVUgQk9MIEJSQSBCUkIgQlJOIEJUTiBCV0EgQ0FGIENBTiBDQ0sgQ0hFIENITCBDSE4gQ0lWIENNUiBcbiAgOCAgMTAgICA0ICAgNCAgIDMgICAxICAxMCAgIDEgICAzICAxOCAgIDEgIDEwICAgMiAgIDIgICAzICAxNCAgMzQgIDIyICAgOCAgMTMgICAzICAgMSBcbkNPRCBDT0cgQ09LIENPTCBDT00gQ1BWIENSSSBDVUIgQ1VXIENYUiBDWU0gQ1lQIENaRSBERVUgREpJIERNQSBETksgRE9NIERaQSBFQ1UgRUdZIEVSSSBcbiAgMiAgIDEgICA2ICAxNCAgIDEgICAzICAgNiAgIDEgICA4ICAgMiAgIDYgIDQ2ICAxNiAgMzYgICAzICAgMyAgMzkgICA0ICAgOSAgIDQgICAzICAgNCBcbkVTSCBFU1AgRVNUIEVUSCBFVVIgRklOIEZKSSBGTEsgRlJBIEZSTyBGU00gR0FCIEdCUiBHRU8gR0dZIEdIQSBHSUIgR0lOIEdMUCBHTUIgR05CIEdOUSBcbiAgMiAgMTMgIDEzICAgMiAgMTggIDI3ICAgMyAgIDEgICA4ICAgMyAgIDIgICAzICAgMSAgIDUgICAxICAgNCAgIDQgICAyICAgOSAgIDMgICAxICAgNyBcbkdSQyBHUkQgR1JMIEdUTSBHVUYgR1VNIEdVWSBIS0cgSE5EIEhSViBIVEkgSFVOIElETiBJTU4gSU5EIElPVCBJUkwgSVJOIElSUSBJU0wgSVNSIElUQSBcbiA0MSAgIDcgICA5ICAxMCAgIDIgICAxICAgNCAgMTMgICAzICAgNCAgIDIgIDI5ICAgNSAgIDIgICA5ICAgMSAgIDUgICA1ICAxNiAgMTUgICA3ICAxNSBcbkpBTSBKRVkgSk9SIEpQTiBLQVogS0VOIEtHWiBLSE0gS0lSIEtOQSBLT1IgS1dUIExBTyBMQk4gTEJSIExCWSBMQ0EgTElFIExLQSBMU08gTFRVIExVWCBcbiAgNiAgIDIgIDEyICAxNiAgIDQgICA2ICAgNCAgIDggICAzICAgNSAgIDUgIDEwICAgOCAgIDUgICA0ICAgMiAgIDYgICAxICAgNyAgIDMgIDI2ICAxNCBcbkxWQSBNQUMgTUFGIE1BUiBNQ08gTURBIE1ERyBNRFYgTUVYIE1ITCBNS0QgTUxJIE1MVCBNTVIgTU5FIE1ORyBNTlAgTU9aIE1SVCBNU1IgTVRRIE1VUyBcbiAyOCAgIDMgICAyICAxNyAgIDEgICA3ICAgNSAgIDcgICAxICAgNyAgIDUgICAyICAxNiAgIDcgICA5ICAgNCAgIDEgICA1ICAgMyAgIDIgICAxICAxMiBcbk1XSSBNWVMgTVlUIE5BTSBOQ0wgTkVSIE5GSyBOR0EgTklDIE5JVSBOTEQgTk9SIE5QTCBOUlUgTlpMIE9NTiBQQUsgUEFOIFBDTiBQRVIgUEhMIFBMVyBcbiAgNSAgIDkgICAxICAgNyAgIDEgICAyICAgMyAgIDggICAyICAgMSAgMjggIDExICAgNiAgIDUgICAzICAxNSAgMTIgICA3ICAgMSAgIDkgIDEwICAgMyBcblBORyBQT0wgUFJJIFBSSyBQUlQgUFJZIFBTRSBQWUYgUUFUIFJFVSBST1UgUlVTIFJXQSBTQVUgU0ROIFNFTiBTR1AgU0hOIFNKTSBTTEIgU0xFIFNMViBcbiAgNCAgIDkgICAxICAgMSAgIDggIDEwICAgNiAgIDQgICA0ICAgMyAgMjggIDE2ICAgMSAgMTcgICA0ICAgNSAgMTMgICAxICAgMyAgIDUgICAzICAgMyBcblNNUiBTT0wgU09NIFNQTSBTUkIgU1NEIFNUUCBTVVIgU1ZLIFNWTiBTV0UgU1daIFNYTSBTWUMgU1lSIFRDQSBUQ0QgVEdPIFRIQSBUSksgVEtMIFRLTSBcbiAgMSAgIDIgICAzICAgMSAgMTAgICAyICAgMyAgIDMgIDIyICAxMyAgMTIgICAyICAxMiAgMTUgICA2ICAgMiAgIDMgICA0ICAgNCAgIDMgICAxICAgNCBcblRMUyBUT04gVFRPIFRVTiBUVVIgVFVWIFRXTiBUWkEgVUdBIFVLUiBVUlkgVVNBIFVaQiBWQVQgVkVOIFZHQiBWSVIgVk5NIFZVVCBXTEYgV1NNIFhLWCBcbiAgNCAgIDIgICAyICAgOCAgMTQgICAxICAgOSAgIDMgICAzICAgNCAgIDUgIDE3ICAgNSAgIDEgICA1ICAgMyAgIDIgICA3ICAgMSAgIDIgICAxICAgNCBcbllFTSBaQUYgWk1CIFpXRSBcbiAgMiAgIDQgICAyICAgMyBcblsxXSBcXFBPTElDWV9UWVBFXFxcblxuICAgICAgICAgICBDT01QTEVURSBOT1BPTElDWUlNUExFTUVOVEVEICAgICAgICAgICAgIFBBUlRJQUwgXG4gICAgICAgICAgICAgICAgNDIyICAgICAgICAgICAgICAgICAgIDcgICAgICAgICAgICAgICAgMTMzMyBcblsxXSBcXFBPTElDWV9TVUJUWVBFXFxcblxuICBCT1JERVJfQ0xPU1VSRSAgICBDSVRJWkVOX0VYQ0VQICBDSVRJWkVOU0hJUF9CQU4gICBFU1NFTlRJQUxfT05MWSAgICAgIEhJU1RPUllfQkFOIFxuICAgICAgICAgICAgIDgyOCAgICAgICAgICAgICAgMTc3ICAgICAgICAgICAgICAxOTQgICAgICAgICAgICAgICAzNiAgICAgICAgICAgICAgMjQ1IFxuICAgICAgICAgICAgTk9ORSAgICAgIFJFRlVHRUVfQkFOIFNQRUNJRklDX0NPVU5UUlkgICAgICAgICBWSVNBX0JBTiAgICAgICBXT1JLX0VYQ0VQIFxuICAgICAgICAgICAgICAgNyAgICAgICAgICAgICAgICAzICAgICAgICAgICAgICAgNzkgICAgICAgICAgICAgICA2MyAgICAgICAgICAgICAgMTMwIFxuWzFdIFxcQUlSXFxcblxuICAgMCAgICAxIFxuMTA3MyAgNjg5IFxuWzFdIFxcTEFORFxcXG5cbiAgIDAgICAgMSBcbjE1MTEgIDI1MSBcblsxXSBcXFNFQVxcXG5cbiAgIDAgICAgMSBcbjE1MzQgIDIyOCBcblsxXSBcXENJVElaRU5cXFxuXG4gICAwICAgIDEgXG4xNTY4ICAxOTQgXG5bMV0gXFxISVNUT1JZX0JBTlxcXG5cbiAgIDAgICAgMSBcbjE0OTIgIDI3MCBcblsxXSBcXFJFRlVHRUVcXFxuXG4gICAwICAgIDEgXG4xNzU5ICAgIDMgXG5bMV0gXFxWSVNBX0JBTlxcXG5cbiAgIDAgICAgMSBcbjE2OTkgICA2MyBcblsxXSBcXENJVElaRU5fRVhDRVBcXFxuXG4gICAwICAgIDEgXG4xMzkwICAzNzIgXG5bMV0gXFxDT1VOVFJZX0VYQ0VQXFxcblxuICAgMCAgICAxIFxuMTYyNSAgMTM3IFxuWzFdIFxcV09SS19FWENFUFxcXG5cbiAgIDAgICAgMSBcbjE2MzIgIDEzMCBcbiJ9 -->
+<pre><code>[1] \ISO3\
+
+ABW AFG AGO AIA ALA ALB AND ARE ARG ARM ASM ATA ATG AUS AUT AZE BDI BEL BEN BES BFA BGD 
+  9   4   7   3  17   9   1  10   7   4  18   1   9   7  29  10   4  21   3   9   2   7 
+BGR BHR BHS BIH BLM BLR BLZ BMU BOL BRA BRB BRN BTN BWA CAF CAN CCK CHE CHL CHN CIV CMR 
+  8  10   4   4   3   1  10   1   3  18   1  10   2   2   3  14  34  22   8  13   3   1 
+COD COG COK COL COM CPV CRI CUB CUW CXR CYM CYP CZE DEU DJI DMA DNK DOM DZA ECU EGY ERI 
+  2   1   6  14   1   3   6   1   8   2   6  46  16  36   3   3  39   4   9   4   3   4 
+ESH ESP EST ETH EUR FIN FJI FLK FRA FRO FSM GAB GBR GEO GGY GHA GIB GIN GLP GMB GNB GNQ 
+  2  13  13   2  18  27   3   1   8   3   2   3   1   5   1   4   4   2   9   3   1   7 
+GRC GRD GRL GTM GUF GUM GUY HKG HND HRV HTI HUN IDN IMN IND IOT IRL IRN IRQ ISL ISR ITA 
+ 41   7   9  10   2   1   4  13   3   4   2  29   5   2   9   1   5   5  16  15   7  15 
+JAM JEY JOR JPN KAZ KEN KGZ KHM KIR KNA KOR KWT LAO LBN LBR LBY LCA LIE LKA LSO LTU LUX 
+  6   2  12  16   4   6   4   8   3   5   5  10   8   5   4   2   6   1   7   3  26  14 
+LVA MAC MAF MAR MCO MDA MDG MDV MEX MHL MKD MLI MLT MMR MNE MNG MNP MOZ MRT MSR MTQ MUS 
+ 28   3   2  17   1   7   5   7   1   7   5   2  16   7   9   4   1   5   3   2   1  12 
+MWI MYS MYT NAM NCL NER NFK NGA NIC NIU NLD NOR NPL NRU NZL OMN PAK PAN PCN PER PHL PLW 
+  5   9   1   7   1   2   3   8   2   1  28  11   6   5   3  15  12   7   1   9  10   3 
+PNG POL PRI PRK PRT PRY PSE PYF QAT REU ROU RUS RWA SAU SDN SEN SGP SHN SJM SLB SLE SLV 
+  4   9   1   1   8  10   6   4   4   3  28  16   1  17   4   5  13   1   3   5   3   3 
+SMR SOL SOM SPM SRB SSD STP SUR SVK SVN SWE SWZ SXM SYC SYR TCA TCD TGO THA TJK TKL TKM 
+  1   2   3   1  10   2   3   3  22  13  12   2  12  15   6   2   3   4   4   3   1   4 
+TLS TON TTO TUN TUR TUV TWN TZA UGA UKR URY USA UZB VAT VEN VGB VIR VNM VUT WLF WSM XKX 
+  4   2   2   8  14   1   9   3   3   4   5  17   5   1   5   3   2   7   1   2   1   4 
+YEM ZAF ZMB ZWE 
+  2   4   2   3 
+[1] \POLICY_TYPE\
+
+           COMPLETE NOPOLICYIMPLEMENTED             PARTIAL 
+                422                   7                1333 
+[1] \POLICY_SUBTYPE\
+
+  BORDER_CLOSURE    CITIZEN_EXCEP  CITIZENSHIP_BAN   ESSENTIAL_ONLY      HISTORY_BAN 
+             828              177              194               36              245 
+            NONE      REFUGEE_BAN SPECIFIC_COUNTRY         VISA_BAN       WORK_EXCEP 
+               7                3               79               63              130 
+[1] \AIR\
 
    0    1 
 1073  689 
-[1] &quot;LAND&quot;
+[1] \LAND\
 
    0    1 
 1511  251 
-[1] &quot;SEA&quot;
+[1] \SEA\
 
    0    1 
 1534  228 
-[1] &quot;CITIZEN&quot;
+[1] \CITIZEN\
 
    0    1 
 1568  194 
-[1] &quot;HISTORY_BAN&quot;
+[1] \HISTORY_BAN\
 
    0    1 
 1492  270 
-[1] &quot;REFUGEE&quot;
+[1] \REFUGEE\
 
    0    1 
 1759    3 
-[1] &quot;VISA_BAN&quot;
+[1] \VISA_BAN\
 
    0    1 
 1699   63 
-[1] &quot;CITIZEN_EXCEP&quot;
+[1] \CITIZEN_EXCEP\
 
    0    1 
 1390  372 
-[1] &quot;COUNTRY_EXCEP&quot;
+[1] \COUNTRY_EXCEP\
 
    0    1 
 1625  137 
-[1] &quot;WORK_EXCEP&quot;
+[1] \WORK_EXCEP\
 
    0    1 
 1632  130 </code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>we know that there are 1762 observations total. we substitute out visa_ban (0 or 1 values) with visa_ban_type, which encapsulates all, specific, or none – we will need to one-hot encode this! other ones I am interested in are history_ban_list and either citizen_list or citizen_list (it seems like these two would be closely linked). If I use these, then eliminate history_ban and citizen/citizen_excep from consideration (these are values that don’t have N/As)</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBzb21lIGRhdGEgY2xlYW5pbmcgLS0gaG93IGNhbiB3ZSBzdGlsbCB1c2UgdGhlIFxuYGBgIn0= -->
-<pre class="r"><code># some data cleaning -- how can we still use the </code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBkYXRhIGNsZWFuaW5nIGZvciBOQSB2YWx1ZXNcbmNvbFN1bXMoaXMubmEobW9kX2RmKSlbY29sU3Vtcyhpcy5uYShtb2RfZGYpKSAhPSAwXVxuYGBgIn0= -->
+<pre class="r"><code># data cleaning for NA values
+colSums(is.na(mod_df))[colSums(is.na(mod_df)) != 0]</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgICBJU08yICAgICAgICAgICBBSVJfVFlQRSAgICAgICAgVEFSR0VUU19BSVIgICAgICAgICAgTEFORF9UWVBFIFxuICAgICAgICAgICAgICAgICA3ICAgICAgICAgICAgICAgMTA3MyAgICAgICAgICAgICAgIDExNjkgICAgICAgICAgICAgICAxNTExIFxuICAgICAgVEFSR0VUU19MQU5EICAgICAgICAgICBTRUFfVFlQRSAgICAgICAgVEFSR0VUU19TRUEgICAgICAgQ0lUSVpFTl9MSVNUIFxuICAgICAgICAgICAgICAxNTcxICAgICAgICAgICAgICAgMTUzNCAgICAgICAgICAgICAgIDE1NTQgICAgICAgICAgICAgICAxNTY4IFxuICBISVNUT1JZX0JBTl9MSVNUICAgICAgIFJFRlVHRUVfTElTVCAgICAgIFZJU0FfQkFOX1RZUEUgICAgICBWSVNBX0JBTl9MSVNUIFxuICAgICAgICAgICAgICAxNDkyICAgICAgICAgICAgICAgMTc2MCAgICAgICAgICAgICAgIDE2OTkgICAgICAgICAgICAgICAxNzQxIFxuQ0lUSVpFTl9FWENFUF9MSVNUIENPVU5UUllfRVhDRVBfTElTVCBcbiAgICAgICAgICAgICAgMTM5MCAgICAgICAgICAgICAgIDE2MjUgXG4ifQ== -->
+<pre><code>              ISO2           AIR_TYPE        TARGETS_AIR          LAND_TYPE 
+                 7               1073               1169               1511 
+      TARGETS_LAND           SEA_TYPE        TARGETS_SEA       CITIZEN_LIST 
+              1571               1534               1554               1568 
+  HISTORY_BAN_LIST       REFUGEE_LIST      VISA_BAN_TYPE      VISA_BAN_LIST 
+              1492               1760               1699               1741 
+CITIZEN_EXCEP_LIST COUNTRY_EXCEP_LIST 
+              1390               1625 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kX2RmJFZJU0FfQkFOX05PTkUgPC0gcmVwKDAsIG5yb3cobW9kX2RmKSlcbm1vZF9kZltpcy5uYShtb2RfZGYkVklTQV9CQU5fVFlQRSksIF0kVklTQV9CQU5fTk9ORSA8LSAxXG5cbm1vZF9kZiRWSVNBX0JBTl9BTEwgPC0gcmVwKDAsIG5yb3cobW9kX2RmKSlcbm1vZF9kZlttb2RfZGYkVklTQV9CQU5fVFlQRSA9PSBcIkFsbFwiIFxuICAgICAgICYgIWlzLm5hKG1vZF9kZiRWSVNBX0JBTl9UWVBFKSwgXSRWSVNBX0JBTl9BTEwgPC0gMVxuXG5tb2RfZGYkVklTQV9CQU5fU1BFQ0lGSUMgPC0gcmVwKDAsIG5yb3cobW9kX2RmKSlcbm1vZF9kZlttb2RfZGYkVklTQV9CQU5fVFlQRSA9PSBcInNwZWNpZmljXCIgXG4gICAgICAgJiAhaXMubmEobW9kX2RmJFZJU0FfQkFOX1RZUEUpLCBdJFZJU0FfQkFOX1NQRUNJRklDIDwtIDFcbmBgYCJ9 -->
+<pre class="r"><code>mod_df$VISA_BAN_NONE &lt;- rep(0, nrow(mod_df))
+mod_df[is.na(mod_df$VISA_BAN_TYPE), ]$VISA_BAN_NONE &lt;- 1
+
+mod_df$VISA_BAN_ALL &lt;- rep(0, nrow(mod_df))
+mod_df[mod_df$VISA_BAN_TYPE == &quot;All&quot; 
+       &amp; !is.na(mod_df$VISA_BAN_TYPE), ]$VISA_BAN_ALL &lt;- 1
+
+mod_df$VISA_BAN_SPECIFIC &lt;- rep(0, nrow(mod_df))
+mod_df[mod_df$VISA_BAN_TYPE == &quot;specific&quot; 
+       &amp; !is.na(mod_df$VISA_BAN_TYPE), ]$VISA_BAN_SPECIFIC &lt;- 1</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>for clustering, will use - policy_type, (maybe policy_subtype?) – need to one-hot-encode - length of policy (end_date - start_date) - air, land, sea, possibly citizen/citizen_excep, refugee, visa_ban, country_excep, work_excep</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBhZ2dyZWdhdGluZyBieSBjb3VudHJ5IC0tIGhvcGVmdWxseSBOQSB3aWxsIG5vdCBjcmVhdGUgYW4gaXNzdWUgbm93XG5gYGAifQ== -->
-<pre class="r"><code># aggregating by country -- hopefully NA will not create an issue now</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBkYXRhIGNsZWFuaW5nIGZvciBub24tTkEgdmFsdWVzXG5jb2xTdW1zKGlzLm5hKG1vZF9kZikpW2NvbFN1bXMoaXMubmEobW9kX2RmKSkgPT0gMF1cbmBgYCJ9 -->
+<pre class="r"><code># data cleaning for non-NA values
+colSums(is.na(mod_df))[colSums(is.na(mod_df)) == 0]</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgSUQgICBDT1VOVFJZX05BTUUgICAgICAgICAgIElTTzMgICAgUE9MSUNZX1RZUEUgUE9MSUNZX1NVQlRZUEUgICAgIFNUQVJUX0RBVEUgXG4gICAgICAgICAgICAgMCAgICAgICAgICAgICAgMCAgICAgICAgICAgICAgMCAgICAgICAgICAgICAgMCAgICAgICAgICAgICAgMCAgICAgICAgICAgICAgMCBcbiAgICAgIEVORF9EQVRFICAgICAgICAgICAgQUlSICAgICAgICAgICBMQU5EICAgICAgICAgICAgU0VBICAgICAgICBDSVRJWkVOICAgIEhJU1RPUllfQkFOIFxuICAgICAgICAgICAgIDAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgIDAgXG4gICAgICAgUkVGVUdFRSAgICAgICBWSVNBX0JBTiAgQ0lUSVpFTl9FWENFUCAgQ09VTlRSWV9FWENFUCAgICAgV09SS19FWENFUCBcbiAgICAgICAgICAgICAwICAgICAgICAgICAgICAwICAgICAgICAgICAgICAwICAgICAgICAgICAgICAwICAgICAgICAgICAgICAwIFxuIn0= -->
+<pre><code>            ID   COUNTRY_NAME           ISO3    POLICY_TYPE POLICY_SUBTYPE     START_DATE 
+             0              0              0              0              0              0 
+      END_DATE            AIR           LAND            SEA        CITIZEN    HISTORY_BAN 
+             0              0              0              0              0              0 
+       REFUGEE       VISA_BAN  CITIZEN_EXCEP  COUNTRY_EXCEP     WORK_EXCEP 
+             0              0              0              0              0 </code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>goals by next Wednesday: - kMeans cluster on selected variables - hierarchical cluster - (not needed by next Wednesday, but we can vary the number of clusters and where you stop on the dendrogram) – can talk about this as next steps - plot two variables from demographics – then plot the clusters we previously generated (for immigration policies) – this can be a wednesday goal! - can also run the cluster algorithm on the demographics data – does not need to be a wednesday goal - WorldBank, Gap Minder (may have an R package!) – other potential data sets for the demographic - try different distance metrics to see how much the answer changes (how robust is it to that choice?) - k-modes clustering – better suited for categorical data</p>
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiRmluYWwgUHJvamVjdCBFREEiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCmBgYHtyfQpsaWJyYXJ5KGRwbHlyKQpkYXRhIDwtIHJlYWQuY3N2KCdkYXRhL2ltbWlncmF0aW9uX3BvbGljaWVzL3BvbGljeV9saXN0LmNzdicpCiMgc3VtbWFyeShkYXRhKQpgYGAKCmBgYHtyfQpjb2xTdW1zKGlzLm5hKGRhdGEpKVtjb2xTdW1zKGlzLm5hKGRhdGEpKSAhPSAwXQoKbW9kX2RmIDwtIGRhdGEuZnJhbWUoZGF0YSkKCiMgZHJvcHBpbmcgY29sdW1ucyB0aGF0IHdpbGwgbm90IGFmZmVjdCBvdXIgZGF0YSBhbmFseXNpcyBpbiBhbnkgd2F5Cm1vZF9kZiA8LSBzZWxlY3QobW9kX2RmLCAtYygnU09VUkNFX1FVQUxJVFknOidPTERfSUQnKSkKY29sU3Vtcyhpcy5uYShtb2RfZGYpKVtjb2xTdW1zKGlzLm5hKG1vZF9kZikpICE9IDBdCmNvbFN1bXMoaXMubmEobW9kX2RmKSlbY29sU3Vtcyhpcy5uYShtb2RfZGYpKSA9PSAwXQpgYGAKCmBgYHtyfQojIHRhYmxlcyB0byBzdW1tYXJpemUgZGF0YQoKZm9yIChpIGluIDE6bGVuZ3RoKGNvbG5hbWVzKG1vZF9kZikpKSB7CiAgY29sdW1uID0gY29sbmFtZXMobW9kX2RmKVtpXQogIGlmIChjbGFzcyhtb2RfZGZbLCBjb2x1bW5dKSA9PSAiaW50ZWdlciIpIHsKICAgIHByaW50KGNvbHVtbikKICAgIHByaW50KHRhYmxlKG1vZF9kZlssIGNvbHVtbl0pKQogIH0KfQpgYGAKCmBgYHtyfQojIHNvbWUgZGF0YSBjbGVhbmluZyAtLSBob3cgY2FuIHdlIHN0aWxsIHVzZSB0aGUgCmBgYAoKYGBge3J9CiMgYWdncmVnYXRpbmcgYnkgY291bnRyeSAtLSBob3BlZnVsbHkgTkEgd2lsbCBub3QgY3JlYXRlIGFuIGlzc3VlIG5vdwpgYGAKCgo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiRmluYWwgUHJvamVjdCBFREEiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCgpgYGB7cn0KbGlicmFyeShtbHRvb2xzKQpsaWJyYXJ5KGRhdGEudGFibGUpCmxpYnJhcnkoZHBseXIpCmBgYAoKYGBge3J9CmRhdGEgPC0gcmVhZC5jc3YoJ2RhdGEvaW1taWdyYXRpb25fcG9saWNpZXMvcG9saWN5X2xpc3QuY3N2JykKIyBzdW1tYXJ5KGRhdGEpCgpgYGAKCmBgYHtyfQpjb2xTdW1zKGlzLm5hKGRhdGEpKVtjb2xTdW1zKGlzLm5hKGRhdGEpKSAhPSAwXQoKbW9kX2RmIDwtIGRhdGEuZnJhbWUoZGF0YSkKCiMgZHJvcHBpbmcgY29sdW1ucyB0aGF0IHdpbGwgbm90IGFmZmVjdCBvdXIgZGF0YSBhbmFseXNpcyBpbiBhbnkgd2F5Cm1vZF9kZiA8LSBzZWxlY3QobW9kX2RmLCAtYygnU09VUkNFX1FVQUxJVFknOidPTERfSUQnKSkKY29sU3Vtcyhpcy5uYShtb2RfZGYpKVtjb2xTdW1zKGlzLm5hKG1vZF9kZikpICE9IDBdCmNvbFN1bXMoaXMubmEobW9kX2RmKSlbY29sU3Vtcyhpcy5uYShtb2RfZGYpKSA9PSAwXQpgYGAKCmBgYHtyfQojIHRhYmxlcyB0byBzdW1tYXJpemUgZGF0YQojIGZpbmQgdHdlbHZlIHZhcmlhYmxlcyB0aGF0IG1vc3QgaW50ZXJlc3RlZCBpbiwgYW5kIGRvIGNvcnJlbGF0aW4gbWF0cml4CiMgaWYgY2VydGFpbiB2YXJpYWJsZXMgYXJlIHZlcnkgaGlnaGx5IGNvcnJlbGF0ZWQsIHRoZW4gb25seSB1c2Ugb25lIG9mIHRoZSB0d28KCiMgZ2VvbSBqaXR0ZXIgLS0gcG9pbnRzIHdvbid0IGJlIGxheWluZyBvbiB0b3Agb2YgZWFjaCBvdGhlcgoKZm9yIChpIGluIDE6bGVuZ3RoKGNvbG5hbWVzKG1vZF9kZikpKSB7CiAgY29sdW1uID0gY29sbmFtZXMobW9kX2RmKVtpXQogIGlmIChzdW0oaXMubmEobW9kX2RmWywgY29sdW1uXSkpID09IDApIHsKICAgIGlmICghKGNvbHVtbiAlaW4lIGMoIklEIiwgIkNPVU5UUllfTkFNRSIsICJJU08yIiwgIklEIiwgIlNUQVJUX0RBVEUiLCAKICAgICAgICAgICAgICAgICAgICAgICAgIkVORF9EQVRFIiwgIklTTzMiKSkpIHsKICAgICAgcHJpbnQoY29sdW1uKQogICAgICBwcmludCh0YWJsZShtb2RfZGZbLCBjb2x1bW5dKSkKICAgIH0KICB9Cn0KYGBgCgoKd2Uga25vdyB0aGF0IHRoZXJlIGFyZSAxNzYyIG9ic2VydmF0aW9ucyB0b3RhbC4gd2Ugc3Vic3RpdHV0ZSBvdXQgdmlzYV9iYW4gKDAgb3IgMSB2YWx1ZXMpCndpdGggdmlzYV9iYW5fdHlwZSwgd2hpY2ggZW5jYXBzdWxhdGVzIGFsbCwgc3BlY2lmaWMsIG9yIG5vbmUgLS0gd2Ugd2lsbCBuZWVkIHRvIG9uZS1ob3QgZW5jb2RlIHRoaXMhIG90aGVyIG9uZXMgSSBhbSBpbnRlcmVzdGVkIGluIGFyZSBoaXN0b3J5X2Jhbl9saXN0IGFuZCBlaXRoZXIgY2l0aXplbl9saXN0IG9yIGNpdGl6ZW5fbGlzdCAoaXQgc2VlbXMgbGlrZSB0aGVzZSB0d28gd291bGQgYmUgY2xvc2VseSBsaW5rZWQpLiBJZiBJIHVzZSB0aGVzZSwgdGhlbiBlbGltaW5hdGUgaGlzdG9yeV9iYW4gYW5kIGNpdGl6ZW4vY2l0aXplbl9leGNlcCBmcm9tIGNvbnNpZGVyYXRpb24gKHRoZXNlIGFyZSB2YWx1ZXMgdGhhdCBkb24ndCBoYXZlIE4vQXMpCgpgYGB7cn0KIyBkYXRhIGNsZWFuaW5nIGZvciBOQSB2YWx1ZXMKY29sU3Vtcyhpcy5uYShtb2RfZGYpKVtjb2xTdW1zKGlzLm5hKG1vZF9kZikpICE9IDBdCgptb2RfZGYkVklTQV9CQU5fTk9ORSA8LSByZXAoMCwgbnJvdyhtb2RfZGYpKQptb2RfZGZbaXMubmEobW9kX2RmJFZJU0FfQkFOX1RZUEUpLCBdJFZJU0FfQkFOX05PTkUgPC0gMQoKbW9kX2RmJFZJU0FfQkFOX0FMTCA8LSByZXAoMCwgbnJvdyhtb2RfZGYpKQptb2RfZGZbbW9kX2RmJFZJU0FfQkFOX1RZUEUgPT0gIkFsbCIgCiAgICAgICAmICFpcy5uYShtb2RfZGYkVklTQV9CQU5fVFlQRSksIF0kVklTQV9CQU5fQUxMIDwtIDEKCm1vZF9kZiRWSVNBX0JBTl9TUEVDSUZJQyA8LSByZXAoMCwgbnJvdyhtb2RfZGYpKQptb2RfZGZbbW9kX2RmJFZJU0FfQkFOX1RZUEUgPT0gInNwZWNpZmljIiAKICAgICAgICYgIWlzLm5hKG1vZF9kZiRWSVNBX0JBTl9UWVBFKSwgXSRWSVNBX0JBTl9TUEVDSUZJQyA8LSAxCmBgYAoKZm9yIGNsdXN0ZXJpbmcsIHdpbGwgdXNlIAotIHBvbGljeV90eXBlLCAobWF5YmUgcG9saWN5X3N1YnR5cGU/KSAtLSBuZWVkIHRvIG9uZS1ob3QtZW5jb2RlCi0gbGVuZ3RoIG9mIHBvbGljeSAoZW5kX2RhdGUgLSBzdGFydF9kYXRlKQotIGFpciwgbGFuZCwgc2VhLCBwb3NzaWJseSBjaXRpemVuL2NpdGl6ZW5fZXhjZXAsIHJlZnVnZWUsIHZpc2FfYmFuLCBjb3VudHJ5X2V4Y2VwLCB3b3JrX2V4Y2VwCgoKYGBge3J9CiMgZGF0YSBjbGVhbmluZyBmb3Igbm9uLU5BIHZhbHVlcwpjb2xTdW1zKGlzLm5hKG1vZF9kZikpW2NvbFN1bXMoaXMubmEobW9kX2RmKSkgPT0gMF0KYGBgCgpnb2FscyBieSBuZXh0IFdlZG5lc2RheToKLSBrTWVhbnMgY2x1c3RlciBvbiBzZWxlY3RlZCB2YXJpYWJsZXMKLSBoaWVyYXJjaGljYWwgY2x1c3RlciAKLSAobm90IG5lZWRlZCBieSBuZXh0IFdlZG5lc2RheSwgYnV0IHdlIGNhbiB2YXJ5IHRoZSBudW1iZXIgb2YgY2x1c3RlcnMgYW5kIHdoZXJlIHlvdSBzdG9wIG9uIHRoZSBkZW5kcm9ncmFtKSAtLSBjYW4gdGFsayBhYm91dCB0aGlzIGFzIG5leHQgc3RlcHMKLSBwbG90IHR3byB2YXJpYWJsZXMgZnJvbSBkZW1vZ3JhcGhpY3MgLS0gdGhlbiBwbG90IHRoZSBjbHVzdGVycyB3ZSBwcmV2aW91c2x5IGdlbmVyYXRlZCAoZm9yIGltbWlncmF0aW9uIHBvbGljaWVzKSAtLSB0aGlzIGNhbiBiZSBhIHdlZG5lc2RheSBnb2FsIQotIGNhbiBhbHNvIHJ1biB0aGUgY2x1c3RlciBhbGdvcml0aG0gb24gdGhlIGRlbW9ncmFwaGljcyBkYXRhIC0tIGRvZXMgbm90IG5lZWQgdG8gYmUgYSB3ZWRuZXNkYXkgZ29hbAotIFdvcmxkQmFuaywgR2FwIE1pbmRlciAobWF5IGhhdmUgYW4gUiBwYWNrYWdlISkgLS0gb3RoZXIgcG90ZW50aWFsIGRhdGEgc2V0cyBmb3IgdGhlIGRlbW9ncmFwaGljCi0gdHJ5IGRpZmZlcmVudCBkaXN0YW5jZSBtZXRyaWNzIHRvIHNlZSBob3cgbXVjaCB0aGUgYW5zd2VyIGNoYW5nZXMgKGhvdyByb2J1c3QgaXMgaXQgdG8gdGhhdCBjaG9pY2U/KQotIGstbW9kZXMgY2x1c3RlcmluZyAtLSBiZXR0ZXIgc3VpdGVkIGZvciBjYXRlZ29yaWNhbCBkYXRhCg==</div>
 
 
 
