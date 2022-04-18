@@ -89,10 +89,6 @@ country_counter <- function(obj) {
 
 mod_df$HISTORY_BAN_CLEANED <- lapply(mod_df$HISTORY_BAN_LIST, country_counter)
 mod_df$CITIZEN_LIST_CLEANED <- lapply(mod_df$CITIZEN_LIST, country_counter)
-
-
-
-
 ```
 
 for clustering, will use 
@@ -105,6 +101,31 @@ for clustering, will use
 ```{r}
 # data cleaning for non-NA values
 colSums(is.na(mod_df))[colSums(is.na(mod_df)) == 0]
+
+## DATES
+mod_df$START_DATE_CLEANED <- as.Date(mod_df$START_DATE, tryFormats = "%m_%d_%y")
+mod_df$END_DATE_CLEANED <- as.Date(mod_df$END_DATE, tryFormats = "%m_%d_%y")
+# making assumption that "NA" end date means the policy is still in place
+# na values --> setting them equal to today's date
+mod_df[is.na(mod_df$END_DATE_CLEANED), ]$END_DATE_CLEANED <- Sys.Date()
+
+# making (possibly faulty assumption) that the ``negative" policy lengths were never in place
+# set these values equal to zero
+mod_df$POLICY_LENGTH <- difftime(mod_df$END_DATE_CLEANED, mod_df$START_DATE_CLEANED, units = c("days"))
+mod_df[mod_df$POLICY_LENGTH < 0 & !is.na(mod_df$POLICY_LENGTH), ]$POLICY_LENGTH <- 0
+# no policy implemented will have start date of none --> need to set this to zero as well
+mod_df[mod_df$POLICY_TYPE == "NOPOLICYIMPLEMENTED", ]$POLICY_LENGTH <- 0
+
+```
+
+
+```{r}
+## one-hot encoding the policy type
+
+# 0 --> not implemented, 1 --> partially implemented, 2 --> complete
+mod_df$POLICY_TYPE_CLEANED <- rep(0, nrow(mod_df))
+mod_df[mod_df$POLICY_TYPE == "PARTIAL", ]$POLICY_TYPE_CLEANED <- 1
+mod_df[mod_df$POLICY_TYPE == "COMPLETE", ]$POLICY_TYPE_CLEANED <- 2
 
 ```
 
