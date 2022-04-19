@@ -84,11 +84,11 @@ country_counter <- function(obj) {
   if (is.na(obj)) {
     return(0)
   }
-  return ((str_count(obj, ',')) + 1)
+  return ((str_count(obj, ','))[1] + 1)
 }
 
-mod_df$HISTORY_BAN_CLEANED <- lapply(mod_df$HISTORY_BAN_LIST, country_counter)
-mod_df$CITIZEN_LIST_CLEANED <- lapply(mod_df$CITIZEN_LIST, country_counter)
+mod_df$HISTORY_BAN_CLEANED <- unlist(lapply(mod_df$HISTORY_BAN_LIST, country_counter))
+mod_df$CITIZEN_LIST_CLEANED <- unlist(lapply(mod_df$CITIZEN_LIST, country_counter))
 ```
 
 for clustering, will use 
@@ -116,6 +116,7 @@ mod_df$POLICY_LENGTH <- difftime(mod_df$END_DATE_CLEANED, mod_df$START_DATE_CLEA
 mod_df[mod_df$POLICY_LENGTH < 0 & !is.na(mod_df$POLICY_LENGTH), ]$POLICY_LENGTH <- 0
 # no policy implemented will have start date of none --> need to set this to zero as well
 mod_df[mod_df$POLICY_TYPE == "NOPOLICYIMPLEMENTED", ]$POLICY_LENGTH <- 0
+mod_df$POLICY_LENGTH <- as.numeric(mod_df$POLICY_LENGTH)
 
 ```
 
@@ -142,6 +143,35 @@ VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL, HISTORY_BAN_CLEANED, CITIZEN_LIS
 ones we've left alone:
 
 AIR, LAND, SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP
+
+```{r}
+# post data cleaning -- need to aggregate by country
+vars <- c("COUNTRY_NAME", "ISO3", "VISA_BAN_NONE", "VISA_BAN_SPECIFIC", "VISA_BAN_ALL",
+          "HISTORY_BAN_CLEANED", "CITIZEN_LIST_CLEANED", "POLICY_LENGTH",
+          "POLICY_TYPE_CLEANED", "AIR", "LAND", "SEA", "REFUGEE",
+          "COUNTRY_EXCEP", "WORK_EXCEP")
+
+cleaned_df <- subset(mod_df, select=vars)
+
+```
+
+
+```{r}
+# hopefully ISO3 can be easily matched with other data sets
+by_country <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
+                              HISTORY_BAN_CLEANED,
+                              CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_CLEANED, 
+                              AIR, LAND, 
+                              SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~ISO3, cleaned_df, mean)
+
+```
+
+
+NOW, we can work with the by_country data frame!!!
+```{r}
+
+```
+
 
 goals by next Wednesday:
 - kMeans cluster on selected variables
