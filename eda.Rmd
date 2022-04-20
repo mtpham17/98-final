@@ -9,6 +9,8 @@ library(mltools)
 library(data.table)
 library(dplyr)
 library(stringr)
+library(klaR)
+library(gapminder)
 ```
 
 ```{r}
@@ -162,14 +164,16 @@ by_country <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
                               HISTORY_BAN_CLEANED,
                               CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_CLEANED, 
                               AIR, LAND, 
-                              SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~ISO3, cleaned_df, mean)
+                              SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~COUNTRY_NAME, cleaned_df, mean)
 
 ```
 
 
 NOW, we can work with the by_country data frame!!!
 ```{r}
-
+# kmodes clustering
+cluster.results <- kmeans(by_country[,2:ncol(by_country)], 3, 
+                          iter.max = 10, nstart = 1)
 ```
 
 
@@ -182,3 +186,6 @@ goals by next Wednesday:
 - WorldBank, Gap Minder (may have an R package!) -- other potential data sets for the demographic
 - try different distance metrics to see how much the answer changes (how robust is it to that choice?)
 - k-modes clustering -- better suited for categorical data
+
+
+- see how clusters change with inclusion of different variables
