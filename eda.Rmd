@@ -190,18 +190,35 @@ kcluster_by_country$cluster6 <- cluster.results.6$cluster
 
 dist_mat <- dist(by_country[,2:ncol(by_country)], method = 'euclidean')
 hclust_avg <- hclust(dist_mat, method = 'average')
+
+jpeg(file="cluster_den.jpg")
 plot(hclust_avg)
+dev.off()
 
 cut_avg3 <- cutree(hclust_avg, k = 3)
 cut_avg6 <- cutree(hclust_avg, k = 6)
 
 avg_dend_obj <- as.dendrogram(hclust_avg)
 avg_col_dend3 <- color_branches(avg_dend_obj, k = 3)
-plot(avg_col_dend3)
-
 avg_col_dend6 <- color_branches(avg_dend_obj, k = 6)
-plot(avg_col_dend6)
 
+jpeg(file="cluster_den3.jpg")
+plot(avg_col_dend3)
+dev.off()
+
+jpeg(file="cluster_den6.jpg")
+plot(avg_col_dend6)
+dev.off()
+
+
+jpeg(file="cluster_den_3.jpg")
+hcluster_by_country3 <- mutate(by_country, cluster = cut_avg3)
+hcluster_by_country6 <- mutate(by_country, cluster = cut_avg6)
+
+hcluster_by_country <- data.frame(by_country)
+
+hcluster_by_country$cluster3 <- hcluster_by_country3$cluster
+hcluster_by_country$cluster6 <- hcluster_by_country6$cluster
 ```
 
 
@@ -213,12 +230,21 @@ population <- read.csv('data/demographic/population.csv')
 
 ```{r}
 
-master_df <- merge(by_country, gdp, by.x = "ISO3", by.y = "Code")
-master_df <- merge(master_df, population, by.x = "ISO3", by.y = "Code")
-master_df <- subset(master_df, select = -c(X.x, X.y, Name.x, Name.y))
+master_df_k <- merge(kcluster_by_country, gdp, by.x = "ISO3", by.y = "Code")
+master_df_k <- merge(master_df_k, population, by.x = "ISO3", by.y = "Code")
+master_df_k <- subset(master_df_k, select = -c(X.x, X.y, Name.x, Name.y))
+
+master_df_h <- merge(hcluster_by_country, gdp, by.x = "ISO3", by.y = "Code")
+master_df_h <- merge(master_df_h, population, by.x = "ISO3", by.y = "Code")
+master_df_h <- subset(master_df_h, select = -c(X.x, X.y, Name.x, Name.y))
 
 ```
 
+
+
+```{r}
+
+```
 
 goals by next Wednesday:
 - kMeans cluster on selected variables
