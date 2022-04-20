@@ -262,7 +262,7 @@ p3 <- ggplot(master_df_h, aes(x = Pop, y = GDP, color = cluster3)) + geom_point(
 p3 + ggtitle("HAC: 3 Clusters") + scale_fill_brewer(palette="Set3")
 dev.off()
 
-jpeg(file="hac6_jpg")
+jpeg(file="hac_6.jpg")
 p4 <- ggplot(master_df_h, aes(x = Pop, y = GDP, color = cluster6)) + geom_point(size=2) 
 p4 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 dev.off()
