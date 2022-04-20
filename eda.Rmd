@@ -11,6 +11,7 @@ library(dplyr)
 library(stringr)
 library(klaR)
 library(gapminder)
+library(ggplot2)
 library(dendextend)
 ```
 
@@ -26,7 +27,7 @@ colSums(is.na(data))[colSums(is.na(data)) != 0]
 mod_df <- data.frame(data)
 
 # dropping columns that will not affect our data analysis in any way
-mod_df <- select(mod_df, -c('SOURCE_QUALITY':'OLD_ID'))
+mod_df <- mod_df[, -c(32:44)]
 colSums(is.na(mod_df))[colSums(is.na(mod_df)) != 0]
 colSums(is.na(mod_df))[colSums(is.na(mod_df)) == 0]
 ```
@@ -180,8 +181,8 @@ cluster.results.6 <- kmeans(by_country[,2:ncol(by_country)], 6,
                           iter.max = 10, nstart = 1)
 
 kcluster_by_country = data.frame(by_country)
-kcluster_by_country$cluster3 <- cluster.results.3$cluster
-kcluster_by_country$cluster6 <- cluster.results.6$cluster
+kcluster_by_country$cluster3 <- as.factor(cluster.results.3$cluster)
+kcluster_by_country$cluster6 <- as.factor(cluster.results.6$cluster)
 ```
 
 
@@ -217,8 +218,8 @@ hcluster_by_country6 <- mutate(by_country, cluster = cut_avg6)
 
 hcluster_by_country <- data.frame(by_country)
 
-hcluster_by_country$cluster3 <- hcluster_by_country3$cluster
-hcluster_by_country$cluster6 <- hcluster_by_country6$cluster
+hcluster_by_country$cluster3 <- as.factor(hcluster_by_country3$cluster)
+hcluster_by_country$cluster6 <- as.factor(hcluster_by_country6$cluster)
 ```
 
 
@@ -243,6 +244,29 @@ master_df_h <- subset(master_df_h, select = -c(X.x, X.y, Name.x, Name.y))
 
 
 ```{r}
+# plot(master_df_k$GDP, master_df_k$Pop, col = master_df_k$cluster3)
+# plot(jitter(master_df_k$Pop), master_df_k$GDP, pch = 16, col = master_df_k$cluster3)
+
+jpeg(file="kmeans_3.jpg")
+p1 <- ggplot(master_df_k, aes(x = Pop, y = GDP, color = cluster3)) + geom_point(size=2) 
+p1 + ggtitle("K-Means: 3 Clusters") + scale_fill_brewer(palette="Set3")
+dev.off()
+
+jpeg(file="kmeans_6.jpg")
+p2 <- ggplot(master_df_k, aes(x = Pop, y = GDP, color = cluster6)) + geom_point(size=2) 
+p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
+dev.off()
+
+jpeg(file="hac_3.jpg")
+p3 <- ggplot(master_df_h, aes(x = Pop, y = GDP, color = cluster3)) + geom_point(size=2) 
+p3 + ggtitle("HAC: 3 Clusters") + scale_fill_brewer(palette="Set3")
+dev.off()
+
+jpeg(file="hac6_jpg")
+p4 <- ggplot(master_df_h, aes(x = Pop, y = GDP, color = cluster6)) + geom_point(size=2) 
+p4 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
+dev.off()
+
 
 ```
 
