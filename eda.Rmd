@@ -11,6 +11,7 @@ library(dplyr)
 library(stringr)
 library(klaR)
 library(gapminder)
+library(dendextend)
 ```
 
 ```{r}
@@ -164,16 +165,58 @@ by_country <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
                               HISTORY_BAN_CLEANED,
                               CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_CLEANED, 
                               AIR, LAND, 
-                              SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~COUNTRY_NAME, cleaned_df, mean)
+                              SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~ISO3, cleaned_df, mean)
 
 ```
 
 
 NOW, we can work with the by_country data frame!!!
 ```{r}
-# kmodes clustering
-cluster.results <- kmeans(by_country[,2:ncol(by_country)], 3, 
+# kmeans clustering
+cluster.results.3 <- kmeans(by_country[,2:ncol(by_country)], 3, 
                           iter.max = 10, nstart = 1)
+
+cluster.results.6 <- kmeans(by_country[,2:ncol(by_country)], 6, 
+                          iter.max = 10, nstart = 1)
+
+kcluster_by_country = data.frame(by_country)
+kcluster_by_country$cluster3 <- cluster.results.3$cluster
+kcluster_by_country$cluster6 <- cluster.results.6$cluster
+```
+
+
+```{r}
+# hierarchical clustering
+
+dist_mat <- dist(by_country[,2:ncol(by_country)], method = 'euclidean')
+hclust_avg <- hclust(dist_mat, method = 'average')
+plot(hclust_avg)
+
+cut_avg3 <- cutree(hclust_avg, k = 3)
+cut_avg6 <- cutree(hclust_avg, k = 6)
+
+avg_dend_obj <- as.dendrogram(hclust_avg)
+avg_col_dend3 <- color_branches(avg_dend_obj, k = 3)
+plot(avg_col_dend3)
+
+avg_col_dend6 <- color_branches(avg_dend_obj, k = 6)
+plot(avg_col_dend6)
+
+```
+
+
+```{r}
+# bringing in demographic data
+gdp <- read.csv('data/demographic/gdp.csv')
+population <- read.csv('data/demographic/population.csv')
+```
+
+```{r}
+
+master_df <- merge(by_country, gdp, by.x = "ISO3", by.y = "Code")
+master_df <- merge(master_df, population, by.x = "ISO3", by.y = "Code")
+master_df <- subset(master_df, select = -c(X.x, X.y, Name.x, Name.y))
+
 ```
 
 
