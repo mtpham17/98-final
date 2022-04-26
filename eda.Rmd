@@ -1,6 +1,6 @@
 ---
 title: "Final Project EDA"
-output: html_notebook
+output: pdf_document
 ---
 
 
@@ -140,7 +140,6 @@ AT THIS POINT, WE ARE DONE WITH CLEANING. THESE ARE THE VARIABLE NAMES WE WANT T
 
 
 ones we've cleaned:
-
 
 VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL, HISTORY_BAN_CLEANED, CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_CLEANED
 
@@ -282,3 +281,15 @@ goals by next Wednesday:
 
 
 - see how clusters change with inclusion of different variables
+
+
+
+FEEDBACK FROM PRESENTATION:
+
+- log of GDP, population to adjust the scale
+- formal tests: 2-sample means on a metric between clusters
+- PCA on demographic factors for ease of visualization
+- formal test to determine how many clusters there are
+- some way to score the different policies, and then see if there is a correlation between that and certain demographic covariates
+- find some indicator of "natural" clustering -- do we see patterns among certain continents, developed vs developing, etc -- then adjust number of clusters based on the number of natural clusters, and see whether the contents of those clusters are the same
+- try running PCA on immigration policies (???)
