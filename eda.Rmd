@@ -13,6 +13,9 @@ library(klaR)
 library(gapminder)
 library(ggplot2)
 library(dendextend)
+library(Hmisc)
+library(mlbench)
+library(caret)
 ```
 
 ```{r}
@@ -160,6 +163,36 @@ cleaned_df <- subset(mod_df, select=vars)
 
 
 ```{r}
+flattenCorrMatrix <- function(cormat, pmat) {
+  ut <- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+    )
+}
+
+data_cor <- rcorr(as.matrix(cleaned_df[, 3:ncol(cleaned_df)]))
+flattenCorrMatrix(data_cor$r, data_cor$P)
+```
+
+
+```{r}
+set.seed(98)
+# load the library
+# calculate correlation matrix
+correlationMatrix <- cor(cleaned_df[, 3:ncol(cleaned_df)])
+# summarize the correlation matrix
+# find attributes that are highly corrected (ideally >0.75)
+highlyCorrelated <- findCorrelation(correlationMatrix, cutoff=0.60)
+# print indexes of highly correlated attributes
+print(highlyCorrelated)
+```
+
+
+
+```{r}
 # hopefully ISO3 can be easily matched with other data sets
 by_country <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
                               HISTORY_BAN_CLEANED,
@@ -184,6 +217,15 @@ kcluster_by_country$cluster3 <- as.factor(cluster.results.3$cluster)
 kcluster_by_country$cluster6 <- as.factor(cluster.results.6$cluster)
 ```
 
+```{r}
+set.seed(98)
+wss<- NULL
+for (i in 1:15){
+  fit = kmeans(by_country[,2:ncol(by_country)], centers = i, nstart = 5)
+  wss = c(wss, fit$tot.withinss)
+}
+plot(1:15, wss, type = "o")
+```
 
 
 ```{r}
@@ -243,6 +285,11 @@ hcluster_by_country <- data.frame(by_country)
 
 hcluster_by_country$cluster3 <- as.factor(hcluster_by_country3$cluster)
 hcluster_by_country$cluster6 <- as.factor(hcluster_by_country6$cluster)
+```
+
+
+```{r}
+# using the elbow method to find the number of clusters
 ```
 
 
