@@ -185,6 +185,30 @@ kcluster_by_country$cluster6 <- as.factor(cluster.results.6$cluster)
 ```
 
 
+
+```{r}
+# Data
+dist_mat <- dist(by_country[,2:ncol(by_country)], method = 'euclidean')
+
+# Hierarchical Agglomerative Clustering
+h1=hclust(dist_mat,method='average')
+h2=hclust(dist_mat,method='complete')
+h3=hclust(dist_mat,method='ward.D')
+h4=hclust(dist_mat,method='single')
+
+# Cophenetic Distances, for each linkage
+c1=cophenetic(h1)
+c2=cophenetic(h2)
+c3=cophenetic(h3)
+c4=cophenetic(h4)
+
+# Correlations
+cor(dist_mat,c1) 
+cor(dist_mat,c2) 
+cor(dist_mat,c3) 
+cor(dist_mat,c4)
+```
+
 ```{r}
 # hierarchical clustering
 
