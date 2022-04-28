@@ -76,6 +76,18 @@ mod_df$VISA_BAN_SPECIFIC <- rep(0, nrow(mod_df))
 mod_df[mod_df$VISA_BAN_TYPE == "specific" 
        & !is.na(mod_df$VISA_BAN_TYPE), ]$VISA_BAN_SPECIFIC <- 1
 
+mod_df$POLICY_TYPE_COMPLETE <- rep(0, nrow(mod_df))
+mod_df[mod_df$POLICY_TYPE ==  "COMPLETE"
+       & !is.na(mod_df$POLICY_TYPE), ]$POLICY_TYPE_COMPLETE <- 1
+
+mod_df$POLICY_TYPE_PARTIAL <- rep(0, nrow(mod_df))
+mod_df[mod_df$POLICY_TYPE ==  "PARTIAL"
+       & !is.na(mod_df$POLICY_TYPE), ]$POLICY_TYPE_PARTIAL <- 1
+
+mod_df$POLICY_TYPE_NON <- rep(0, nrow(mod_df))
+mod_df[mod_df$POLICY_TYPE ==  "NOPOLICYIMPLEMENTED"
+       & !is.na(mod_df$POLICY_TYPE), ]$POLICY_TYPE_NON <- 1
+
 ```
 
 ```{r}
@@ -154,8 +166,8 @@ AIR, LAND, SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP
 # post data cleaning -- need to aggregate by country
 vars <- c("COUNTRY_NAME", "ISO3", "VISA_BAN_NONE", "VISA_BAN_SPECIFIC", "VISA_BAN_ALL",
           "HISTORY_BAN_CLEANED", "CITIZEN_LIST_CLEANED", "POLICY_LENGTH",
-          "POLICY_TYPE_CLEANED", "AIR", "LAND", "SEA", "REFUGEE",
-          "COUNTRY_EXCEP", "WORK_EXCEP")
+          "POLICY_TYPE_COMPLETE", "POLICY_TYPE_PARTIAL", "AIR", "LAND", "SEA", 
+          "POLICY_TYPE_NON", "REFUGEE", "COUNTRY_EXCEP", "WORK_EXCEP")
 
 cleaned_df <- subset(mod_df, select=vars)
 
@@ -196,7 +208,8 @@ print(highlyCorrelated)
 # hopefully ISO3 can be easily matched with other data sets
 by_country <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
                               HISTORY_BAN_CLEANED,
-                              CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_CLEANED, 
+                              CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_NON, 
+                              POLICY_TYPE_COMPLETE, POLICY_TYPE_PARTIAL,
                               AIR, LAND, 
                               SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~ISO3, cleaned_df, mean)
 
@@ -235,7 +248,6 @@ dist_mat <- dist(by_country[,2:ncol(by_country)], method = 'euclidean')
 # Hierarchical Agglomerative Clustering
 h1=hclust(dist_mat,method='average')
 h2=hclust(dist_mat,method='complete')
-h3=hclust(dist_mat,method='ward.D')
 h4=hclust(dist_mat,method='single')
 
 # Cophenetic Distances, for each linkage
@@ -318,26 +330,35 @@ master_df_h <- subset(master_df_h, select = -c(X.x, X.y, Name.x, Name.y))
 # plot(jitter(master_df_k$Pop), master_df_k$GDP, pch = 16, col = master_df_k$cluster3)
 
 jpeg(file="kmeans_3.jpg")
-p1 <- ggplot(master_df_k, aes(x = Pop, y = GDP, color = cluster3)) + geom_point(size=2) 
+p1 <- ggplot(master_df_k, aes(x = log(Pop), y = log(GDP), color = cluster3)) + geom_point(size=2) 
 p1 + ggtitle("K-Means: 3 Clusters") + scale_fill_brewer(palette="Set3")
 dev.off()
 
 jpeg(file="kmeans_6.jpg")
-p2 <- ggplot(master_df_k, aes(x = Pop, y = GDP, color = cluster6)) + geom_point(size=2) 
+p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(GDP), color = cluster6)) + geom_point(size=2) 
 p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
 dev.off()
 
 jpeg(file="hac_3.jpg")
-p3 <- ggplot(master_df_h, aes(x = Pop, y = GDP, color = cluster3)) + geom_point(size=2) 
+p3 <- ggplot(master_df_h, aes(x = log(Pop), y = log(GDP), color = cluster3)) + geom_point(size=2) 
 p3 + ggtitle("HAC: 3 Clusters") + scale_fill_brewer(palette="Set3")
 dev.off()
 
 jpeg(file="hac_6.jpg")
-p4 <- ggplot(master_df_h, aes(x = Pop, y = GDP, color = cluster6)) + geom_point(size=2) 
+p4 <- ggplot(master_df_h, aes(x = log(Pop), y = log(GDP), color = cluster6)) + geom_point(size=2) 
 p4 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 dev.off()
 
 
+```
+
+
+```{r}
+summary(cleaned_df)
+new_vars <- c("VISA_BAN_NONE", "VISA_BAN_SPECIFIC", "VISA_BAN_ALL",
+          "HISTORY_BAN_CLEANED", "CITIZEN_LIST_CLEANED", "POLICY_LENGTH",
+          "POLICY_TYPE_COMPLETE", "POLICY_TYPE_PARTIAL", "AIR", "LAND", "SEA", 
+          "POLICY_TYPE_NON", "REFUGEE", "COUNTRY_EXCEP", "WORK_EXCEP")
 ```
 
 goals by next Wednesday:
