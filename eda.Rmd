@@ -18,6 +18,8 @@ library(mlbench)
 library(caret)
 library(factoextra)
 library(NbClust)
+library(fossil)
+library(countrycode)
 ```
 
 ```{r}
@@ -260,7 +262,7 @@ FOR MEETING WITH KELLY:
 - have decided not to cluster countries based on their demographic factors, and to instead use that as a more informal way to investigate the clusters based on immigration policies
 
 To do before meeting:
-- download data on GDP, population, life expectancy, education rate, and fertility rate
+- download data on GDP, population, life expectancy, education rate, and fertility rate DONE
 - officially decide on the number of clusters and linkage for HAC and K-means DONE
 - the results section will consist of some visuals (probably PCA to get two dimensions -- but is this interpretable?), ANOVA test on those same factors (GDP, population, life expectancy, education rate, fertility rate) across different clusters (for both methods)
 - look at the natural way of clustering (by continent, development level)
@@ -374,30 +376,25 @@ iso3 <- read.csv('data/demographic/iso3.csv')
 literacy_rate <- merge(literacy_rate, iso3, by.x = "country", by.y = "Country")
 literacy_rate <- subset(literacy_rate, select = c(latestRate, Alpha.3.code))
 colnames(literacy_rate) <- c('literacy', 'Code')
+literacy_rate$Code <- trimws(literacy_rate$Code)
 ```
 
 
 ```{r}
 
 master_df_k <- merge(kcluster_by_country, gdp, by.x = "ISO3", by.y = "Code")
-master_df_k
 master_df_k <- merge(master_df_k, population, by.x = "ISO3", by.y = "Code")
-master_df_k
 master_df_k <- merge(master_df_k, life_expectancy, by.x = "ISO3", by.y = "Code")
-master_df_k
 master_df_k <- merge(master_df_k, fertility_rate, by.x = "ISO3", by.y = "Code")
-master_df_k
 master_df_k <- merge(master_df_k, literacy_rate, by.x = "ISO3", by.y = "Code")
-master_df_k
-# master_df_k <- subset(master_df_k, select = -c(X.x, X.y, Name.x, Name.y))
+master_df_k <- subset(master_df_k, select = -c(Name.x, X.x, Name.y, X.y))
 
-# master_df_h <- merge(hcluster_by_country, gdp, by.x = "ISO3", by.y = "Code")
-# master_df_h <- merge(master_df_h, population, by.x = "ISO3", by.y = "Code")
-# # master_df_h <- subset(master_df_h, select = -c(X.x, X.y, Name.x, Name.y))
-
-```
-
-```{r}
+master_df_h <- merge(hcluster_by_country, gdp, by.x = "ISO3", by.y = "Code")
+master_df_h <- merge(master_df_h, population, by.x = "ISO3", by.y = "Code")
+master_df_h <- merge(master_df_h, life_expectancy, by.x = "ISO3", by.y = "Code")
+master_df_h <- merge(master_df_h, fertility_rate, by.x = "ISO3", by.y = "Code")
+master_df_h <- merge(master_df_h, literacy_rate, by.x = "ISO3", by.y = "Code")
+master_df_h <- subset(master_df_h, select = -c(Name.x, X.x, Name.y, X.y))
 
 ```
 
@@ -428,6 +425,69 @@ dev.off()
 # dev.off()
 
 
+```
+
+
+```{r}
+# anova stuff
+k_gdp <- aov(GDP ~ cluster3, data = master_df_k)
+k_pop <- aov(Pop ~ cluster3, data = master_df_k) 
+k_exp <- aov(Expectancy ~ cluster3, data = master_df_k) 
+k_fert <- aov(Fertility ~ cluster3, data = master_df_k) 
+k_lit <- aov(literacy ~ cluster3, data = master_df_k) 
+
+summary(k_gdp)
+summary(k_pop)
+summary(k_exp)
+summary(k_fert)
+summary(k_lit)
+```
+
+```{r}
+h_gdp <- aov(GDP ~ cluster3, data = master_df_h)
+h_pop <- aov(Pop ~ cluster3, data = master_df_h) 
+h_exp <- aov(Expectancy ~ cluster3, data = master_df_h) 
+h_fert <- aov(Fertility ~ cluster3, data = master_df_h) 
+h_lit <- aov(literacy ~ cluster3, data = master_df_h) 
+
+summary(h_gdp)
+summary(h_pop)
+summary(h_exp)
+summary(h_fert)
+summary(h_lit)
+```
+
+https://gist.github.com/tadast/8827699
+https://worldpopulationreview.com/country-rankings/literacy-rate-by-country
+https://www.datanovia.com/en/lessons/determining-the-optimal-number-of-clusters-3-must-know-methods/
+
+questions:
+
+- whether PCA from 5 to 2 variables is interpretable/useful in the first place
+- thinking of using Rand index to compare clustering: https://en.wikipedia.org/wiki/Rand_index (continent, development level)
+- do I have enough? should I be 
+- motivating the problem -- making sure I'm not just saying that it's interesting ``to me"
+
+```{r}
+# need to merge continent and development level into the data
+continents <- read.csv('data/demographic/continent.csv')
+continents <- subset(continents, select = c(continent, code_3))
+old <- c("Asia", "Europe", "Africa", "Oceania", "Americas")
+new <- 1:length(old)
+continents$continent[continents$continent %in% old] <- new[match(continents$continent, 
+                                                                 old, nomatch = 0)]
+continents$continent <- as.numeric(continents$continent)
+master_df_k_continent <- merge(master_df_k, continents, by.x = "ISO3", by.y = "code_3")
+master_df_h_continent <- merge(master_df_h, continents, by.x = "ISO3", by.y = "code_3")
+```
+
+
+```{r}
+rand.index(as.numeric(levels(master_df_k_continent$cluster3))[master_df_k_continent$cluster3], 
+           master_df_k_continent$continent)
+rand.index(as.numeric(levels(master_df_h_continent$cluster3))[master_df_h_continent$cluster3], 
+           master_df_k_continent$continent)
+# trying to explain these results? need similar data for developed vs undeveloped
 ```
 
 
