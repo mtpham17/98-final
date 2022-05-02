@@ -16,6 +16,8 @@ library(dendextend)
 library(Hmisc)
 library(mlbench)
 library(caret)
+library(factoextra)
+library(NbClust)
 ```
 
 ```{r}
@@ -242,28 +244,6 @@ plot(1:15, wss, type = "o")
 
 
 ```{r}
-# Data
-dist_mat <- dist(by_country[,2:ncol(by_country)], method = 'euclidean')
-
-# Hierarchical Agglomerative Clustering
-h1=hclust(dist_mat,method='average')
-h2=hclust(dist_mat,method='complete')
-h4=hclust(dist_mat,method='single')
-
-# Cophenetic Distances, for each linkage
-c1=cophenetic(h1)
-c2=cophenetic(h2)
-c3=cophenetic(h3)
-c4=cophenetic(h4)
-
-# Correlations
-cor(dist_mat,c1) 
-cor(dist_mat,c2) 
-cor(dist_mat,c3) 
-cor(dist_mat,c4)
-```
-
-```{r}
 # hierarchical clustering
 
 dist_mat <- dist(by_country[,2:ncol(by_country)], method = 'euclidean')
@@ -385,3 +365,55 @@ FEEDBACK FROM PRESENTATION:
 - some way to score the different policies, and then see if there is a correlation between that and certain demographic covariates
 - find some indicator of "natural" clustering -- do we see patterns among certain continents, developed vs developing, etc -- then adjust number of clusters based on the number of natural clusters, and see whether the contents of those clusters are the same
 - try running PCA on immigration policies (???)
+
+FOR MEETING WITH KELLY:
+- have decided not to cluster countries based on their demographic factors, and to instead use that as a more informal way to investigate the clusters based on immigration policies
+
+To do before meeting:
+- download data on GDP, population, life expectancy, education rate, and fertility rate
+- officially decide on the number of clusters and linkage for HAC and K-means
+- the results section will consist of some visuals (probably PCA to get two dimensions -- but is this interpretable?), ANOVA test on those same factors (GDP, population, life expectancy, education rate, fertility rate) across different clusters (for both methods)
+- look at the natural way of clustering with clustering
+
+DETERMINING THE NUMBER OF CLUSTERS:
+
+```{r}
+fviz_nbclust(by_country[,2:ncol(by_country)], kmeans, nstart = 25,  method = "gap_stat", 
+             nboot =50)+ labs(subtitle = "Gap statistic method for K Means")
+fviz_nbclust(by_country[,2:ncol(by_country)], kmeans, nstart = 25,  method = "wss", 
+             nboot =50)+ labs(subtitle = "Gap statistic method for K Means")
+
+fviz_nbclust(by_country[,2:ncol(by_country)], hcut, nstart = 25,  method = "gap_stat", 
+             nboot = 50)+labs(subtitle = "Gap statistic method for HAC")
+fviz_nbclust(by_country[,2:ncol(by_country)], hcut, nstart = 25,  method = "wss", 
+             nboot = 50)+labs(subtitle = "Gap statistic method for HAC")
+
+# what to do if the two don't agree?
+```
+
+
+DETERMINING THE LINKAGE CRITERIA:
+
+```{r}
+# Data
+dist_mat <- dist(by_country[,2:ncol(by_country)], method = 'euclidean')
+
+# Hierarchical Agglomerative Clustering
+h1=hclust(dist_mat,method='average')
+h2=hclust(dist_mat,method='complete')
+h4=hclust(dist_mat,method='single')
+
+# Cophenetic Distances, for each linkage
+c1=cophenetic(h1)
+c2=cophenetic(h2)
+c4=cophenetic(h4)
+
+# Correlations
+cor(dist_mat,c1) 
+cor(dist_mat,c2) 
+cor(dist_mat,c4)
+```
+
+
+
+
