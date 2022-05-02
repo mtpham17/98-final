@@ -365,17 +365,39 @@ gdp <- read.csv('data/demographic/gdp.csv')
 population <- read.csv('data/demographic/population.csv')
 life_expectancy <- read.csv('data/demographic/life_expectancy.csv')
 fertility_rate <- read.csv('data/demographic/fertility_rate.csv')
+literacy_rate <- read.csv('data/demographic/literacy_rate.csv')
+iso3 <- read.csv('data/demographic/iso3.csv')
 ```
+
+```{r}
+# some data cleaning on literacy rate lol rip :( need to note  
+literacy_rate <- merge(literacy_rate, iso3, by.x = "country", by.y = "Country")
+literacy_rate <- subset(literacy_rate, select = c(latestRate, Alpha.3.code))
+colnames(literacy_rate) <- c('literacy', 'Code')
+```
+
 
 ```{r}
 
 master_df_k <- merge(kcluster_by_country, gdp, by.x = "ISO3", by.y = "Code")
+master_df_k
 master_df_k <- merge(master_df_k, population, by.x = "ISO3", by.y = "Code")
-master_df_k <- subset(master_df_k, select = -c(X.x, X.y, Name.x, Name.y))
+master_df_k
+master_df_k <- merge(master_df_k, life_expectancy, by.x = "ISO3", by.y = "Code")
+master_df_k
+master_df_k <- merge(master_df_k, fertility_rate, by.x = "ISO3", by.y = "Code")
+master_df_k
+master_df_k <- merge(master_df_k, literacy_rate, by.x = "ISO3", by.y = "Code")
+master_df_k
+# master_df_k <- subset(master_df_k, select = -c(X.x, X.y, Name.x, Name.y))
 
-master_df_h <- merge(hcluster_by_country, gdp, by.x = "ISO3", by.y = "Code")
-master_df_h <- merge(master_df_h, population, by.x = "ISO3", by.y = "Code")
-master_df_h <- subset(master_df_h, select = -c(X.x, X.y, Name.x, Name.y))
+# master_df_h <- merge(hcluster_by_country, gdp, by.x = "ISO3", by.y = "Code")
+# master_df_h <- merge(master_df_h, population, by.x = "ISO3", by.y = "Code")
+# # master_df_h <- subset(master_df_h, select = -c(X.x, X.y, Name.x, Name.y))
+
+```
+
+```{r}
 
 ```
 
