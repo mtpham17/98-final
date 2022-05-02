@@ -360,9 +360,11 @@ hcluster_by_country$cluster3 <- as.factor(hcluster_by_country3$cluster)
 ```
 
 ```{r}
-# bringing in demographic data; need life expectancy, education rate, and fertility rate
+# bringing in demographic data; need life expectancy, literacy rate, and fertility rate
 gdp <- read.csv('data/demographic/gdp.csv')
 population <- read.csv('data/demographic/population.csv')
+life_expectancy <- read.csv('data/demographic/life_expectancy.csv')
+fertility_rate <- read.csv('data/demographic/fertility_rate.csv')
 ```
 
 ```{r}
