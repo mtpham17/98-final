@@ -219,118 +219,8 @@ by_country <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
 
 
 NOW, we can work with the by_country data frame!!!
-```{r}
-# kmeans clustering
-cluster.results.3 <- kmeans(by_country[,2:ncol(by_country)], 3, 
-                          iter.max = 10, nstart = 1)
-
-cluster.results.6 <- kmeans(by_country[,2:ncol(by_country)], 6, 
-                          iter.max = 10, nstart = 1)
-
-kcluster_by_country = data.frame(by_country)
-kcluster_by_country$cluster3 <- as.factor(cluster.results.3$cluster)
-kcluster_by_country$cluster6 <- as.factor(cluster.results.6$cluster)
-```
-
-```{r}
-set.seed(98)
-wss<- NULL
-for (i in 1:15){
-  fit = kmeans(by_country[,2:ncol(by_country)], centers = i, nstart = 5)
-  wss = c(wss, fit$tot.withinss)
-}
-plot(1:15, wss, type = "o")
-```
 
 
-```{r}
-# hierarchical clustering
-
-dist_mat <- dist(by_country[,2:ncol(by_country)], method = 'euclidean')
-hclust_avg <- hclust(dist_mat, method = 'average')
-
-jpeg(file="cluster_den.jpg")
-plot(hclust_avg)
-dev.off()
-
-cut_avg3 <- cutree(hclust_avg, k = 3)
-cut_avg6 <- cutree(hclust_avg, k = 6)
-
-avg_dend_obj <- as.dendrogram(hclust_avg)
-avg_col_dend3 <- color_branches(avg_dend_obj, k = 3)
-avg_col_dend6 <- color_branches(avg_dend_obj, k = 6)
-
-jpeg(file="cluster_den3.jpg")
-plot(avg_col_dend3)
-dev.off()
-
-jpeg(file="cluster_den6.jpg")
-plot(avg_col_dend6)
-dev.off()
-
-
-jpeg(file="cluster_den_3.jpg")
-hcluster_by_country3 <- mutate(by_country, cluster = cut_avg3)
-hcluster_by_country6 <- mutate(by_country, cluster = cut_avg6)
-
-hcluster_by_country <- data.frame(by_country)
-
-hcluster_by_country$cluster3 <- as.factor(hcluster_by_country3$cluster)
-hcluster_by_country$cluster6 <- as.factor(hcluster_by_country6$cluster)
-```
-
-
-```{r}
-# using the elbow method to find the number of clusters
-```
-
-
-```{r}
-# bringing in demographic data
-gdp <- read.csv('data/demographic/gdp.csv')
-population <- read.csv('data/demographic/population.csv')
-```
-
-```{r}
-
-master_df_k <- merge(kcluster_by_country, gdp, by.x = "ISO3", by.y = "Code")
-master_df_k <- merge(master_df_k, population, by.x = "ISO3", by.y = "Code")
-master_df_k <- subset(master_df_k, select = -c(X.x, X.y, Name.x, Name.y))
-
-master_df_h <- merge(hcluster_by_country, gdp, by.x = "ISO3", by.y = "Code")
-master_df_h <- merge(master_df_h, population, by.x = "ISO3", by.y = "Code")
-master_df_h <- subset(master_df_h, select = -c(X.x, X.y, Name.x, Name.y))
-
-```
-
-
-
-```{r}
-# plot(master_df_k$GDP, master_df_k$Pop, col = master_df_k$cluster3)
-# plot(jitter(master_df_k$Pop), master_df_k$GDP, pch = 16, col = master_df_k$cluster3)
-
-jpeg(file="kmeans_3.jpg")
-p1 <- ggplot(master_df_k, aes(x = log(Pop), y = log(GDP), color = cluster3)) + geom_point(size=2) 
-p1 + ggtitle("K-Means: 3 Clusters") + scale_fill_brewer(palette="Set3")
-dev.off()
-
-jpeg(file="kmeans_6.jpg")
-p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(GDP), color = cluster6)) + geom_point(size=2) 
-p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
-dev.off()
-
-jpeg(file="hac_3.jpg")
-p3 <- ggplot(master_df_h, aes(x = log(Pop), y = log(GDP), color = cluster3)) + geom_point(size=2) 
-p3 + ggtitle("HAC: 3 Clusters") + scale_fill_brewer(palette="Set3")
-dev.off()
-
-jpeg(file="hac_6.jpg")
-p4 <- ggplot(master_df_h, aes(x = log(Pop), y = log(GDP), color = cluster6)) + geom_point(size=2) 
-p4 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
-dev.off()
-
-
-```
 
 
 ```{r}
@@ -371,22 +261,26 @@ FOR MEETING WITH KELLY:
 
 To do before meeting:
 - download data on GDP, population, life expectancy, education rate, and fertility rate
-- officially decide on the number of clusters and linkage for HAC and K-means
+- officially decide on the number of clusters and linkage for HAC and K-means DONE
 - the results section will consist of some visuals (probably PCA to get two dimensions -- but is this interpretable?), ANOVA test on those same factors (GDP, population, life expectancy, education rate, fertility rate) across different clusters (for both methods)
-- look at the natural way of clustering with clustering
+- look at the natural way of clustering (by continent, development level)
 
 DETERMINING THE NUMBER OF CLUSTERS:
 
 ```{r}
 fviz_nbclust(by_country[,2:ncol(by_country)], kmeans, nstart = 25,  method = "gap_stat", 
              nboot =50)+ labs(subtitle = "Gap statistic method for K Means")
+fviz_nbclust(by_country[,2:ncol(by_country)], kmeans, nstart = 25,  method = "silhouette", 
+             nboot =50)+ labs(subtitle = "Silhouette method for K Means")
 fviz_nbclust(by_country[,2:ncol(by_country)], kmeans, nstart = 25,  method = "wss", 
-             nboot =50)+ labs(subtitle = "Gap statistic method for K Means")
+             nboot =50)+ labs(subtitle = "Elbow method for K Means")
 
 fviz_nbclust(by_country[,2:ncol(by_country)], hcut, nstart = 25,  method = "gap_stat", 
              nboot = 50)+labs(subtitle = "Gap statistic method for HAC")
+fviz_nbclust(by_country[,2:ncol(by_country)], hcut, nstart = 25,  method = "silhouette", 
+             nboot = 50)+labs(subtitle = "Silhouette method for HAC")
 fviz_nbclust(by_country[,2:ncol(by_country)], hcut, nstart = 25,  method = "wss", 
-             nboot = 50)+labs(subtitle = "Gap statistic method for HAC")
+             nboot = 50)+labs(subtitle = "Elbow method for HAC")
 
 # what to do if the two don't agree?
 ```
@@ -414,6 +308,103 @@ cor(dist_mat,c2)
 cor(dist_mat,c4)
 ```
 
+for now, use 3 clusters (for HAC and k-means)
+
+```{r}
+# kmeans clustering
+cluster.results.3 <- kmeans(by_country[,2:ncol(by_country)], 3, 
+                          iter.max = 10, nstart = 1)
+
+# cluster.results.6 <- kmeans(by_country[,2:ncol(by_country)], 6, 
+#                           iter.max = 10, nstart = 1)
+
+kcluster_by_country = data.frame(by_country)
+kcluster_by_country$cluster3 <- as.factor(cluster.results.3$cluster)
+# kcluster_by_country$cluster6 <- as.factor(cluster.results.6$cluster)
+```
+
+
+```{r}
+# hierarchical clustering
+
+dist_mat <- dist(by_country[,2:ncol(by_country)], method = 'euclidean')
+hclust_avg <- hclust(dist_mat, method = 'single')
+
+jpeg(file="cluster_den.jpg")
+plot(hclust_avg)
+dev.off()
+
+cut_avg3 <- cutree(hclust_avg, k = 3)
+# cut_avg6 <- cutree(hclust_avg, k = 6)
+
+avg_dend_obj <- as.dendrogram(hclust_avg)
+avg_col_dend3 <- color_branches(avg_dend_obj, k = 3)
+# avg_col_dend6 <- color_branches(avg_dend_obj, k = 6)
+
+jpeg(file="cluster_den3.jpg")
+plot(avg_col_dend3)
+dev.off()
+
+# jpeg(file="cluster_den6.jpg")
+# plot(avg_col_dend6)
+# dev.off()
+
+
+hcluster_by_country3 <- mutate(by_country, cluster = cut_avg3)
+# hcluster_by_country6 <- mutate(by_country, cluster = cut_avg6)
+
+hcluster_by_country <- data.frame(by_country)
+
+hcluster_by_country$cluster3 <- as.factor(hcluster_by_country3$cluster)
+# hcluster_by_country$cluster6 <- as.factor(hcluster_by_country6$cluster)
+```
+
+```{r}
+# bringing in demographic data; need life expectancy, education rate, and fertility rate
+gdp <- read.csv('data/demographic/gdp.csv')
+population <- read.csv('data/demographic/population.csv')
+```
+
+```{r}
+
+master_df_k <- merge(kcluster_by_country, gdp, by.x = "ISO3", by.y = "Code")
+master_df_k <- merge(master_df_k, population, by.x = "ISO3", by.y = "Code")
+master_df_k <- subset(master_df_k, select = -c(X.x, X.y, Name.x, Name.y))
+
+master_df_h <- merge(hcluster_by_country, gdp, by.x = "ISO3", by.y = "Code")
+master_df_h <- merge(master_df_h, population, by.x = "ISO3", by.y = "Code")
+master_df_h <- subset(master_df_h, select = -c(X.x, X.y, Name.x, Name.y))
+
+```
+
+
+
+```{r}
+# plot(master_df_k$GDP, master_df_k$Pop, col = master_df_k$cluster3)
+# plot(jitter(master_df_k$Pop), master_df_k$GDP, pch = 16, col = master_df_k$cluster3)
+
+jpeg(file="kmeans_3.jpg")
+p1 <- ggplot(master_df_k, aes(x = log(Pop), y = log(GDP), color = cluster3)) + geom_point(size=2) 
+p1 + ggtitle("K-Means: 3 Clusters") + scale_fill_brewer(palette="Set3")
+dev.off()
+
+# jpeg(file="kmeans_6.jpg")
+# p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(GDP), color = cluster6)) + geom_point(size=2) 
+# p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
+# dev.off()
+
+jpeg(file="hac_3.jpg")
+p3 <- ggplot(master_df_h, aes(x = log(Pop), y = log(GDP), color = cluster3)) + geom_point(size=2) 
+p3 + ggtitle("HAC: 3 Clusters") + scale_fill_brewer(palette="Set3")
+dev.off()
+
+# jpeg(file="hac_6.jpg")
+# p4 <- ggplot(master_df_h, aes(x = log(Pop), y = log(GDP), color = cluster6)) + geom_point(size=2) 
+# p4 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
+# dev.off()
+
+
+```
 
 
 
