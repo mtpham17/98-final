@@ -152,9 +152,6 @@ mod_df$POLICY_TYPE_CLEANED <- rep(0, nrow(mod_df))
 mod_df[mod_df$POLICY_TYPE == "PARTIAL", ]$POLICY_TYPE_CLEANED <- 1
 mod_df[mod_df$POLICY_TYPE == "COMPLETE", ]$POLICY_TYPE_CLEANED <- 2
 
-mod_df$POLICY_LENGTH <- (mod_df$POLICY_LENGTH - mean(mod_df$POLICY_LENGTH)) / 
-  sd(mod_df$POLICY_LENGTH)
-
 ```
 
 
@@ -177,6 +174,8 @@ vars <- c("COUNTRY_NAME", "ISO3", "VISA_BAN_NONE", "VISA_BAN_SPECIFIC", "VISA_BA
           "POLICY_TYPE_NON", "REFUGEE", "COUNTRY_EXCEP", "WORK_EXCEP")
 
 cleaned_df <- subset(mod_df, select=vars)
+ind <- sapply(cleaned_df, is.numeric)
+cleaned_df[ind] <- lapply(cleaned_df[ind], scale)
 
 ```
 
@@ -317,6 +316,8 @@ c4=cophenetic(h4)
 cor(dist_mat,c1) 
 cor(dist_mat,c2) 
 cor(dist_mat,c4)
+
+# average is the best linkage method
 ```
 
 for now, use 3 clusters (for HAC and k-means)
