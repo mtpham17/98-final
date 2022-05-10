@@ -669,7 +669,33 @@ ggplot(master_df_k, aes(x = cluster10, y = literacy, fill = cluster10)) +
   geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
   geom_text(aes(group = cluster10, 
                 label = ifelse(test = literacy > median(literacy) + 1.5*IQR(literacy)
-                               |literacy < median(literacy) - 1.5*IQR(literacy), 
+                               | literacy < median(literacy) - 1.5*IQR(literacy), 
+                  yes = ISO3,
+                  no = '')), 
+            position = position_dodge(width=0.75),
+            hjust = "left", size = 3)
+```
+
+```{r}
+ggplot(master_df_h[!is.na(master_df_h$GDP), ], aes(x = cluster10, y = GDP, fill = cluster10)) +
+  geom_boxplot(alpha = 0.3) +
+  geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
+  geom_text(aes(group = cluster10, 
+                label = ifelse(test = GDP > median(GDP) + 1.5*IQR(GDP)
+                               | GDP < median(GDP) - 1.5*IQR(GDP), 
+                  yes = ISO3,
+                  no = '')), 
+            position = position_dodge(width=0.75),
+            hjust = "left", size = 3)
+```
+
+```{r}
+ggplot(master_df_k, aes(x = cluster10, y = Expectancy, fill = cluster10)) +
+  geom_boxplot(alpha = 0.3) +
+  geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
+  geom_text(aes(group = cluster10, 
+                label = ifelse(test = Expectancy > median(Expectancy) + 1.5*IQR(Expectancy)
+                               | Expectancy < median(Expectancy) - 1.5*IQR(Expectancy), 
                   yes = ISO3,
                   no = '')), 
             position = position_dodge(width=0.75),
