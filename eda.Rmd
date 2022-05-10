@@ -173,9 +173,13 @@ vars <- c("COUNTRY_NAME", "ISO3", "VISA_BAN_NONE", "VISA_BAN_SPECIFIC", "VISA_BA
           "POLICY_TYPE_COMPLETE", "POLICY_TYPE_PARTIAL", "AIR", "LAND", "SEA", 
           "POLICY_TYPE_NON", "REFUGEE", "COUNTRY_EXCEP", "WORK_EXCEP")
 
+standardize <- function(col) {
+  return((col - mean(col)) / sd(col))
+}
+
 cleaned_df <- subset(mod_df, select=vars)
 ind <- sapply(cleaned_df, is.numeric)
-cleaned_df[ind] <- lapply(cleaned_df[ind], scale)
+cleaned_df[ind] <- lapply(cleaned_df[ind], standardize)
 
 ```
 
@@ -324,15 +328,16 @@ for now, use 3 clusters (for HAC and k-means)
 
 ```{r}
 # kmeans clustering
-cluster.results.6 <- kmeans(by_country[,2:ncol(by_country)], 6, 
+set.seed(98)
+cluster.results.10 <- kmeans(by_country[,2:ncol(by_country)], 10, 
                           iter.max = 10, nstart = 1)
 
 # cluster.results.6 <- kmeans(by_country[,2:ncol(by_country)], 6, 
 #                           iter.max = 10, nstart = 1)
 
 kcluster_by_country = data.frame(by_country)
-kcluster_by_country$cluster6 <- as.factor(cluster.results.6$cluster)
-# kcluster_by_country$cluster6 <- as.factor(cluster.results.6$cluster)
+kcluster_by_country$cluster10 <- as.factor(cluster.results.10$cluster)
+# kcluster_by_country$cluster10 <- as.factor(cluster.results.6$cluster)
 ```
 
 
@@ -340,34 +345,33 @@ kcluster_by_country$cluster6 <- as.factor(cluster.results.6$cluster)
 # hierarchical clustering
 
 dist_mat <- dist(by_country[,2:ncol(by_country)], method = 'euclidean')
-hclust_avg <- hclust(dist_mat, method = 'single')
+hclust_avg <- hclust(dist_mat, method = 'average')
 
 jpeg(file="cluster_den.jpg")
 plot(hclust_avg)
 dev.off()
 
-cut_avg6 <- cutree(hclust_avg, k = 6)
-# cut_avg6 <- cutree(hclust_avg, k = 6)
+cut_avg10 <- cutree(hclust_avg, k = 10)
 
-avg_dend_obj <- as.dendrogram(hclust_avg, h = 6, leaflab = "none")
+avg_dend_obj <- as.dendrogram(hclust_avg, h = 10, leaflab = "none")
 labels(avg_dend_obj) <- rep(NA, nrow(by_country))
-avg_col_dend6 <- color_branches(avg_dend_obj, k = 6)
+avg_col_dend10 <- color_branches(avg_dend_obj, k = 10)
 
-jpeg(file="cluster_den6.jpg")
-plot(avg_col_dend6)
+jpeg(file="cluster_den10.jpg")
+plot(avg_col_dend10)
 dev.off()
 
 # jpeg(file="cluster_den6.jpg")
 # plot(avg_col_dend6)
 # dev.off()
 
-hcluster_by_country6 <- mutate(by_country, cluster = cut_avg6)
+hcluster_by_country10 <- mutate(by_country, cluster = cut_avg10)
 # hcluster_by_country6 <- mutate(by_country, cluster = cut_avg6)
 
 hcluster_by_country <- data.frame(by_country)
 
-hcluster_by_country$cluster6 <- as.factor(hcluster_by_country6$cluster)
-# hcluster_by_country$cluster6 <- as.factor(hcluster_by_country6$cluster)
+hcluster_by_country$cluster10 <- as.factor(hcluster_by_country10$cluster)
+# hcluster_by_country$cluster10 <- as.factor(hcluster_by_country6$cluster)
 ```
 
 ```{r}
@@ -381,7 +385,8 @@ iso3 <- read.csv('data/demographic/iso3.csv')
 ```
 
 ```{r}
-# some data cleaning on literacy rate lol rip :( need to note  
+# some data cleaning on literacy rate -- need to note how not all of them were pulled from
+# 2020
 literacy_rate <- merge(literacy_rate, iso3, by.x = "country", by.y = "Country")
 literacy_rate <- subset(literacy_rate, select = c(latestRate, Alpha.3.code))
 colnames(literacy_rate) <- c('literacy', 'Code')
@@ -414,11 +419,11 @@ master_df_h <- subset(master_df_h, select = -c(Name.x, X.x, Name.y, X.y))
 # histograms or boxplots -- distribution of these variables across these clusters change
 # for ones that are significant -- look for outliers!
 
-k_gdp <- aov(GDP ~ cluster6, data = master_df_k)
-k_pop <- aov(Pop ~ cluster6, data = master_df_k) 
-k_exp <- aov(Expectancy ~ cluster6, data = master_df_k) 
-k_fert <- aov(Fertility ~ cluster6, data = master_df_k) 
-k_lit <- aov(literacy ~ cluster6, data = master_df_k) 
+k_gdp <- aov(GDP ~ cluster10, data = master_df_k)
+k_pop <- aov(Pop ~ cluster10, data = master_df_k) 
+k_exp <- aov(Expectancy ~ cluster10, data = master_df_k) 
+k_fert <- aov(Fertility ~ cluster10, data = master_df_k) 
+k_lit <- aov(literacy ~ cluster10, data = master_df_k) 
 
 summary(k_gdp)
 summary(k_pop)
@@ -428,11 +433,11 @@ summary(k_lit)
 ```
 
 ```{r}
-h_gdp <- aov(GDP ~ cluster6, data = master_df_h)
-h_pop <- aov(Pop ~ cluster6, data = master_df_h) 
-h_exp <- aov(Expectancy ~ cluster6, data = master_df_h) 
-h_fert <- aov(Fertility ~ cluster6, data = master_df_h) 
-h_lit <- aov(literacy ~ cluster6, data = master_df_h) 
+h_gdp <- aov(GDP ~ cluster10, data = master_df_h)
+h_pop <- aov(Pop ~ cluster10, data = master_df_h) 
+h_exp <- aov(Expectancy ~ cluster10, data = master_df_h) 
+h_fert <- aov(Fertility ~ cluster10, data = master_df_h) 
+h_lit <- aov(literacy ~ cluster10, data = master_df_h) 
 
 summary(h_gdp)
 summary(h_pop)
@@ -481,15 +486,15 @@ master_df_h_hdi <- merge(master_df_h, hdi, by.x = "ISO3", by.y = "Code")
 
 
 ```{r}
-rand.index(as.numeric(levels(master_df_k_continent$cluster6))[master_df_k_continent$cluster6], 
+rand.index(as.numeric(levels(master_df_k_continent$cluster10))[master_df_k_continent$cluster10],
            master_df_k_continent$continent)
-rand.index(as.numeric(levels(master_df_h_continent$cluster6))[master_df_h_continent$cluster6], 
+rand.index(as.numeric(levels(master_df_h_continent$cluster10))[master_df_h_continent$cluster10],
            master_df_k_continent$continent)
-rand.index(as.numeric(levels(master_df_h_continent$cluster6))[master_df_h_continent$cluster6], 
-           as.numeric(levels(master_df_k_continent$cluster6))[master_df_k_continent$cluster6])
-rand.index(as.numeric(levels(master_df_k_hdi$cluster6))[master_df_k_hdi$cluster6], 
+rand.index(as.numeric(levels(master_df_h_continent$cluster10))[master_df_h_continent$cluster10],
+           as.numeric(levels(master_df_k_continent$cluster10))[master_df_k_continent$cluster10])
+rand.index(as.numeric(levels(master_df_k_hdi$cluster10))[master_df_k_hdi$cluster10], 
            master_df_k_hdi$development)
-rand.index(as.numeric(levels(master_df_h_hdi$cluster6))[master_df_h_hdi$cluster6], 
+rand.index(as.numeric(levels(master_df_h_hdi$cluster10))[master_df_h_hdi$cluster10], 
            master_df_h_hdi$development)
 # trying to explain these results? need similar data for developed vs undeveloped
 # be prepared to justify why!!
@@ -513,121 +518,121 @@ rand.index(as.numeric(levels(master_df_h_hdi$cluster6))[master_df_h_hdi$cluster6
 vars <- c("GDP", "Pop", "Expectancy", "Fertility", "literacy")
 pairs <- t(combn(vars, 2))
 
-p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Pop), color = cluster6)) +
+p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Pop), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Expectancy), color = cluster6)) +
+p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Expectancy), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Fertility), color = cluster6)) +
+p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Fertility), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(literacy), color = cluster6)) +
+p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(literacy), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Expectancy), color = cluster6)) +
+p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Expectancy), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(Expectancy), color = cluster6)) +
+p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(Expectancy), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(Fertility), color = cluster6)) +
+p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(Fertility), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(literacy), color = cluster6)) +
+p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(literacy), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(Expectancy), y = log(Fertility), color = cluster6)) +
+p2 <- ggplot(master_df_k, aes(x = log(Expectancy), y = log(Fertility), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(Fertility), y = log(literacy), color = cluster6)) +
+p2 <- ggplot(master_df_k, aes(x = log(Fertility), y = log(literacy), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
 #jpeg(file="kmeans_6.jpg")
-# p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(Expectancy), color = cluster6)) + geom_point(size=2)
+# p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(Expectancy), color = cluster10)) + geom_point(size=2)
 # p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
 #dev.off()
 
 #jpeg(file="hac_6.jpg")
-# p3 <- ggplot(master_df_h, aes(x = log(Pop), y = log(Expectancy), color = cluster6)) + geom_point(size=2) 
+# p3 <- ggplot(master_df_h, aes(x = log(Pop), y = log(Expectancy), color = cluster10)) + geom_point(size=2) 
 # p3 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 #dev.off()
 ```
 
 ```{r}
-p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Pop), color = cluster6)) +
+p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Pop), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Expectancy), color = cluster6)) +
+p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Expectancy), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Fertility), color = cluster6)) +
+p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Fertility), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(literacy), color = cluster6)) +
+p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(literacy), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Expectancy), color = cluster6)) +
+p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Expectancy), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(Pop), y = log(Expectancy), color = cluster6)) +
+p2 <- ggplot(master_df_h, aes(x = log(Pop), y = log(Expectancy), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(Pop), y = log(Fertility), color = cluster6)) +
+p2 <- ggplot(master_df_h, aes(x = log(Pop), y = log(Fertility), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(Pop), y = log(literacy), color = cluster6)) +
+p2 <- ggplot(master_df_h, aes(x = log(Pop), y = log(literacy), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(Expectancy), y = log(Fertility), color = cluster6)) +
+p2 <- ggplot(master_df_h, aes(x = log(Expectancy), y = log(Fertility), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(Fertility), y = log(literacy), color = cluster6)) +
+p2 <- ggplot(master_df_h, aes(x = log(Fertility), y = log(literacy), color = cluster10)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
 ```
 
 
 ```{r}
 jpeg(file="boxplot_k_exp.jpg")
-p <- ggplot(master_df_k, aes(x=cluster6, y=Expectancy, color = cluster6)) + 
+p <- ggplot(master_df_k, aes(x=cluster10, y=Expectancy, color = cluster10)) + 
   geom_boxplot()
 p
 dev.off()
 
-jpeg(file="boxplot_hac_exp.jpg")
-p <- ggplot(master_df_h, aes(x=cluster6, y=Expectancy, color = cluster6)) + 
+jpeg(file="boxplot_hac_gdp.jpg")
+p <- ggplot(master_df_h, aes(x=cluster10, y=gdp, color = cluster10)) + 
   geom_boxplot()
 p
 dev.off()
 
 jpeg(file="boxplot_k_fertility.jpg")
-p <- ggplot(master_df_k, aes(x=cluster6, y=Fertility, color = cluster6)) + 
+p <- ggplot(master_df_k, aes(x=cluster10, y=Fertility, color = cluster10)) + 
   geom_boxplot()
 p
 dev.off()
 
-jpeg(file="boxplot_hac_fertility.jpg")
-p <- ggplot(master_df_h, aes(x=cluster6, y=Fertility, color = cluster6)) + 
+jpeg(file="boxplot_k_literacy.jpg")
+p <- ggplot(master_df_k, aes(x=cluster10, y=Literacy, color = cluster10)) + 
   geom_boxplot()
 p
 dev.off()
@@ -635,6 +640,19 @@ dev.off()
 
 ```
 
+
+```{r}
+
+for (i in 1:10) {
+  print(master_df_h[master_df_h$cluster10 == i, ]$ISO3)
+}
+```
+
+```{r}
+for (i in 1:10) {
+  print(master_df_h[master_df_k$cluster10 == i, ]$ISO3)
+}
+```
 
 questions:
 
@@ -644,5 +662,12 @@ questions:
 - motivating the problem -- making sure I'm not just saying that it's interesting ``to me"
 - don't have all the results yet, and even if I do, am afraid they are not meaningful enough
 - end with what surprised
+
+
+
+FINAL OFFICE HOURS:
+- moving the tables in the data section to the appendix?
+- standardized or original data summary statistics in the table? both?
+- telling a meaningful story with the scatter plot?
 
 
