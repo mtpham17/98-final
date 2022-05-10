@@ -20,6 +20,8 @@ library(factoextra)
 library(NbClust)
 library(fossil)
 library(countrycode)
+library(tidyverse)
+library(ggrepel)
 ```
 
 ```{r}
@@ -620,7 +622,7 @@ p
 dev.off()
 
 jpeg(file="boxplot_hac_gdp.jpg")
-p <- ggplot(master_df_h, aes(x=cluster10, y=gdp, color = cluster10)) + 
+p <- ggplot(master_df_h, aes(x=cluster10, y=GDP, color = cluster10)) + 
   geom_boxplot()
 p
 dev.off()
@@ -632,12 +634,46 @@ p
 dev.off()
 
 jpeg(file="boxplot_k_literacy.jpg")
-p <- ggplot(master_df_k, aes(x=cluster10, y=Literacy, color = cluster10)) + 
+p <- ggplot(master_df_k, aes(x=cluster10, y=literacy, color = cluster10)) + 
   geom_boxplot()
 p
 dev.off()
 
 
+```
+
+```{r}
+
+# test <- subset(master_df_k, select=c(ISO3, cluster10, literacy))
+# test$cluster10 <- as.numeric(levels(test$cluster10))[test$cluster10]
+# 
+# is_outlier <- function(x) {
+#   return(x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x))
+# }
+# 
+# test %>%
+# pivot_longer(names_to = "variable", values_to = "value", -ISO3) %>% 
+# group_by(variable) %>% 
+# mutate(outlier = if_else(is_outlier(value), ISO3, NA_character_)) %>% 
+# ggplot(aes(x = variable, y = value, color = variable)) +
+# geom_boxplot() +
+# geom_text_repel(aes(label = outlier), na.rm = TRUE, show.legend = F) 
+```
+
+
+```{r}
+# not sure how meaningful something like this would be? definitely needs some cleaning up
+# source of code: https://stackoverflow.com/questions/47842646/labelling-outliers-with-ggplot
+ggplot(master_df_k, aes(x = cluster10, y = literacy, fill = cluster10)) +
+  geom_boxplot(alpha = 0.3) +
+  geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
+  geom_text(aes(group = cluster10, 
+                label = ifelse(test = literacy > median(literacy) + 1.5*IQR(literacy)
+                               |literacy < median(literacy) - 1.5*IQR(literacy), 
+                  yes = ISO3,
+                  no = '')), 
+            position = position_dodge(width=0.75),
+            hjust = "left", size = 3)
 ```
 
 
