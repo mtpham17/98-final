@@ -312,17 +312,32 @@ dist_mat <- dist(by_country[,2:ncol(by_country)], method = 'euclidean')
 # Hierarchical Agglomerative Clustering
 h1=hclust(dist_mat,method='average')
 h2=hclust(dist_mat,method='complete')
+h3=hclust(dist_mat,method='centroid')
 h4=hclust(dist_mat,method='single')
+h5=hclust(dist_mat,method="ward.D")
+h6=hclust(dist_mat,method="ward.D2")
+h7=hclust(dist_mat,method="mcquitty")
+h8=hclust(dist_mat,method="median")
 
 # Cophenetic Distances, for each linkage
 c1=cophenetic(h1)
 c2=cophenetic(h2)
+c3=cophenetic(h3)
 c4=cophenetic(h4)
+c5=cophenetic(h5)
+c6=cophenetic(h6)
+c7=cophenetic(h7)
+c8=cophenetic(h8)
 
 # Correlations
 cor(dist_mat,c1) 
 cor(dist_mat,c2) 
+cor(dist_mat, c3)
 cor(dist_mat,c4)
+cor(dist_mat,c5)
+cor(dist_mat, c6)
+cor(dist_mat,c7)
+cor(dist_mat,c8)
 
 # average is the best linkage method
 ```
@@ -343,6 +358,19 @@ kcluster_by_country$cluster10 <- as.factor(cluster.results.10$cluster)
 # kcluster_by_country$cluster10 <- as.factor(cluster.results.6$cluster)
 ```
 
+```{r}
+hclust_centroid <- hclust(dist_mat, method = 'centroid')
+
+plot(hclust_avg)
+
+cut_avg10 <- cutree(hclust_centroid, k = 10)
+
+centroid_dend_obj <- as.dendrogram(hclust_centroid, h = 10, leaflab = "none")
+labels(centroid_dend_obj) <- rep(NA, nrow(by_country))
+test <- color_branches(centroid_dend_obj, k = 10)
+plot(test)
+
+```
 
 ```{r}
 # hierarchical clustering
@@ -661,23 +689,82 @@ p2 <- ggplot(master_df_h, aes(x = log(Fertility), y = log(literacy), color = clu
 p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
 ```
 
+```{r}
+# manually label outliers -- df_k literacy
+master_df_k$outlier_literacy <- rep(0, nrow(master_df_k))
+for (i in 1:10) {
+  med = median(master_df_k[master_df_k$cluster10 == i, ]$literacy)
+  iqr = IQR(master_df_k[master_df_k$cluster10 == i, ]$literacy)
+  master_df_k[master_df_k$cluster10 == i, ]$outlier_literacy <- 
+    (master_df_k[master_df_k$cluster10 == i, ]$literacy > med + 1.5 * iqr) |
+    (master_df_k[master_df_k$cluster10 == i, ]$literacy < med - 1.5 * iqr)
+}
+
+# df_k fertility
+
+master_df_k$outlier_fertility <- rep(0, nrow(master_df_k))
+for (i in 1:10) {
+  med = median(master_df_k[master_df_k$cluster10 == i, ]$Fertility)
+  iqr = IQR(master_df_k[master_df_k$cluster10 == i, ]$Fertility)
+  master_df_k[master_df_k$cluster10 == i, ]$outlier_fertility <- 
+    (master_df_k[master_df_k$cluster10 == i, ]$Fertility > med + 1.5 * iqr) |
+    (master_df_k[master_df_k$cluster10 == i, ]$Fertility < med - 1.5 * iqr)
+}
+
+# df_k expectancy
+
+master_df_k$outlier_expectancy <- rep(0, nrow(master_df_k))
+for (i in 1:10) {
+  med = median(master_df_k[master_df_k$cluster10 == i, ]$Expectancy)
+  iqr = IQR(master_df_k[master_df_k$cluster10 == i, ]$Expectancy)
+  master_df_k[master_df_k$cluster10 == i, ]$outlier_expectancy <- 
+    (master_df_k[master_df_k$cluster10 == i, ]$Expectancy> med + 1.5 * iqr) |
+    (master_df_k[master_df_k$cluster10 == i, ]$Expectancy < med - 1.5 * iqr)
+}
+
+```
+
+
+```{r}
+# outliers for df_h
+
+master_df_h$outlier_expectancy <- rep(0, nrow(master_df_h))
+for (i in 1:10) {
+  med = median(master_df_k[master_df_h$cluster10 == i, ]$Expectancy)
+  iqr = IQR(master_df_k[master_df_h$cluster10 == i, ]$Expectancy)
+  master_df_h[master_df_h$cluster10 == i, ]$outlier_expectancy <- 
+    (master_df_h[master_df_h$cluster10 == i, ]$Expectancy> med + 1.5 * iqr) |
+    (master_df_h[master_df_h$cluster10 == i, ]$Expectancy < med - 1.5 * iqr)
+}
+
+master_df_h$outlier_gdp <- rep(0, nrow(master_df_h))
+for (i in 1:10) {
+  med = median(log(master_df_k[master_df_h$cluster10 == i, ]$GDP))
+  iqr = IQR(log(master_df_k[master_df_h$cluster10 == i, ]$GDP))
+  master_df_h[master_df_h$cluster10 == i, ]$outlier_gdp <- 
+    (log(master_df_h[master_df_h$cluster10 == i, ]$GDP) > med + 1.5 * iqr) |
+    (log(master_df_h[master_df_h$cluster10 == i, ]$GDP) < med - 1.5 * iqr)
+}
+
+
+```
 
 
 ```{r}
 # not sure how meaningful something like this would be? definitely needs some cleaning up
 # source of code: https://stackoverflow.com/questions/47842646/labelling-outliers-with-ggplot
 jpeg(file="boxplot_k_literacy.jpg")
+# do this manually
 ggplot(master_df_k, aes(x = cluster10, y = literacy, fill = cluster10)) +
   geom_boxplot(alpha = 0.3) +
   geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
   geom_text_repel(aes(group = cluster10, 
-                label = ifelse(test = literacy > median(literacy) + 1.5*IQR(literacy)
-                               | literacy < median(literacy) - 1.5*IQR(literacy), 
+                label = ifelse(outlier_literacy, 
                   yes = ISO3,
                   no = '')), 
             position = position_dodge(width=0.75),
-            hjust = "left", size = 3) + ggtitle("HAC GDP Boxplot") + xlab("Policy Cluster") + 
-  theme(legend.position = "none")
+            hjust = "left", size = 3) + 
+  ggtitle("HAC Literacy Boxplot") + xlab("Policy Cluster") + theme(legend.position = "none")
 dev.off()
 ```
 
@@ -687,8 +774,7 @@ ggplot(master_df_k, aes(x = cluster10, y = Fertility, fill = cluster10)) +
   geom_boxplot(alpha = 0.3) +
   geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
   geom_text_repel(aes(group = cluster10, 
-                label = ifelse(test = Fertility > median(Fertility) + 1.5*IQR(Fertility)
-                               | Fertility < median(Fertility) - 1.5*IQR(Fertility), 
+                label = ifelse(outlier_fertility,
                   yes = ISO3,
                   no = '')), 
             position = position_dodge(width=0.75),
@@ -706,8 +792,7 @@ ggplot(master_df_h[!is.na(master_df_h$GDP), ], aes(x = cluster10, y = log(GDP), 
   geom_boxplot(alpha = 0.3) +
   geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
   geom_text_repel(aes(group = cluster10, 
-                label = ifelse(test = log(GDP) > median(log(GDP)) + 1.5*IQR(log(GDP))
-                               | log(GDP) < median(log(GDP)) - 1.5*IQR(log(GDP)), 
+                label = ifelse(outlier_gdp, 
                   yes = ISO3,
                   no = '')), 
             position = position_dodge(width=0.75),
@@ -726,9 +811,7 @@ ggplot(master_df_k,
   geom_boxplot(alpha = 0.3) +
   geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
   geom_text_repel(aes(group = cluster10, 
-                label = ifelse(test = Expectancy > median(Expectancy)
-                               + 1.5*IQR(Expectancy) | Expectancy < 
-                                 median(Expectancy) - 1.5*IQR(Expectancy), 
+                label = ifelse(outlier_expectancy, 
                   yes = ISO3,
                   no = '')), 
             position = position_dodge(width=0.75),
@@ -744,9 +827,7 @@ ggplot(master_df_h,
   geom_boxplot(alpha = 0.3) +
   geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
   geom_text_repel(aes(group = cluster10, 
-                label = ifelse(test = Expectancy > median(Expectancy)
-                               + 1.5*IQR(Expectancy) | Expectancy < 
-                                 median(Expectancy) - 1.5*IQR(Expectancy), 
+                label = ifelse(outlier_expectancy, 
                   yes = ISO3,
                   no = '')), 
             position = position_dodge(width=0.75),
@@ -763,12 +844,32 @@ names_k <- merge(master_df_k, iso3, by.x = "ISO3", by.y = "Alpha.3.code")
 countries_h <- data.frame()
 countries_k <- rep(NA, 10)
 for (i in 1:10) {
-  names_h[names_h$cluster10 == i, ]$Country
-  names_h[names_k$cluster10 == i, ]$Country
+  print(names_h[names_h$cluster10 == i, ]$Country)
 }
+```
+```{r}
+countries_h <- list()
+for (i in 1:10) {
+  countries_h[[i]] <- names_h[names_h$cluster10 == i, ]$Country
+}
+kable(countries_h, "latex")
+
+countries_k <- list()
+for (i in 1:10) {
+  countries_k[[i]] <- names_h[names_h$cluster10 == i, ]$Country
+}
+kable(countries_k, "latex")
 ```
 
 ```{r}
+for (i in 1:10) {
+  print(names_h[names_k$cluster10 == i, ]$Country)
+}
+```
+
+
+```{r}
+# trying to figure out how to format the above nicely into a table?
 #appendix (use xtable to format into Latex)
 # kableExtra
 tb <- split(master_df_k, master_df_k$cluster10)
