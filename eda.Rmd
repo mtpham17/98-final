@@ -1,6 +1,6 @@
 ---
 title: "Final Project EDA"
-output: pdf_document
+output: rmarkdown::latex_document
 ---
 
 
@@ -22,6 +22,7 @@ library(fossil)
 library(countrycode)
 library(tidyverse)
 library(ggrepel)
+library(kableExtra)
 ```
 
 ```{r}
@@ -610,8 +611,6 @@ p2 <- ggplot(master_df_k, aes(x = log(Fertility), y = log(literacy), color = clu
 p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
 #jpeg(file="kmeans_6.jpg")
-# p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(Expectancy), color = cluster10)) + geom_point(size=2)
-# p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
 #dev.off()
 
 #jpeg(file="hac_6.jpg")
@@ -663,114 +662,116 @@ p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
 ```
 
 
-```{r}
-jpeg(file="boxplot_k_exp.jpg")
-p <- ggplot(master_df_k, aes(x=cluster10, y=Expectancy, color = cluster10)) + 
-  geom_boxplot()
-p
-dev.off()
-
-jpeg(file="boxplot_hac_gdp.jpg")
-p <- ggplot(master_df_h, aes(x=cluster10, y=GDP, color = cluster10)) + 
-  geom_boxplot()
-p
-dev.off()
-
-jpeg(file="boxplot_k_fertility.jpg")
-p <- ggplot(master_df_k, aes(x=cluster10, y=Fertility, color = cluster10)) + 
-  geom_boxplot()
-p
-dev.off()
-
-jpeg(file="boxplot_k_literacy.jpg")
-p <- ggplot(master_df_k, aes(x=cluster10, y=literacy, color = cluster10)) + 
-  geom_boxplot()
-p
-dev.off()
-
-
-```
-
-```{r}
-
-# test <- subset(master_df_k, select=c(ISO3, cluster10, literacy))
-# test$cluster10 <- as.numeric(levels(test$cluster10))[test$cluster10]
-# 
-# is_outlier <- function(x) {
-#   return(x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x))
-# }
-# 
-# test %>%
-# pivot_longer(names_to = "variable", values_to = "value", -ISO3) %>% 
-# group_by(variable) %>% 
-# mutate(outlier = if_else(is_outlier(value), ISO3, NA_character_)) %>% 
-# ggplot(aes(x = variable, y = value, color = variable)) +
-# geom_boxplot() +
-# geom_text_repel(aes(label = outlier), na.rm = TRUE, show.legend = F) 
-```
-
 
 ```{r}
 # not sure how meaningful something like this would be? definitely needs some cleaning up
 # source of code: https://stackoverflow.com/questions/47842646/labelling-outliers-with-ggplot
+jpeg(file="boxplot_k_literacy.jpg")
 ggplot(master_df_k, aes(x = cluster10, y = literacy, fill = cluster10)) +
   geom_boxplot(alpha = 0.3) +
   geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
-  geom_text(aes(group = cluster10, 
+  geom_text_repel(aes(group = cluster10, 
                 label = ifelse(test = literacy > median(literacy) + 1.5*IQR(literacy)
                                | literacy < median(literacy) - 1.5*IQR(literacy), 
                   yes = ISO3,
                   no = '')), 
             position = position_dodge(width=0.75),
-            hjust = "left", size = 3)
+            hjust = "left", size = 3) + ggtitle("HAC GDP Boxplot") + xlab("Policy Cluster") + 
+  theme(legend.position = "none")
+dev.off()
 ```
 
 ```{r}
+jpeg(file="boxplot_k_fertility.jpg")
+ggplot(master_df_k, aes(x = cluster10, y = Fertility, fill = cluster10)) +
+  geom_boxplot(alpha = 0.3) +
+  geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
+  geom_text_repel(aes(group = cluster10, 
+                label = ifelse(test = Fertility > median(Fertility) + 1.5*IQR(Fertility)
+                               | Fertility < median(Fertility) - 1.5*IQR(Fertility), 
+                  yes = ISO3,
+                  no = '')), 
+            position = position_dodge(width=0.75),
+            hjust = "left", size = 3) + ggtitle("HAC GDP Boxplot") + xlab("Policy Cluster") + 
+  theme(legend.position = "none")
+
+dev.off()
+```
+
+
+```{r}
+jpeg(file="boxplot_h_gdp.jpg")
 ggplot(master_df_h[!is.na(master_df_h$GDP), ], aes(x = cluster10, y = log(GDP), fill = 
                                                      cluster10)) +
   geom_boxplot(alpha = 0.3) +
   geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
-  geom_text(aes(group = cluster10, 
+  geom_text_repel(aes(group = cluster10, 
                 label = ifelse(test = log(GDP) > median(log(GDP)) + 1.5*IQR(log(GDP))
                                | log(GDP) < median(log(GDP)) - 1.5*IQR(log(GDP)), 
                   yes = ISO3,
                   no = '')), 
             position = position_dodge(width=0.75),
-            hjust = "left", size = 3)
+            hjust = "left", size = 3) +
+  ggtitle("HAC GDP Boxplot") + xlab("Policy Cluster") + theme(legend.position = "none")
+dev.off()
 
 # ggrepel
 # deal with missing data
 ```
 
 ```{r}
-ggplot(master_df_k[!is.na(master_df_k$Expectancy), ], 
-       aes(x = cluster10, y = log(Expectancy), fill = cluster10)) +
+jpeg(file = "boxplot_k_expectancy.jpg")
+ggplot(master_df_k, 
+       aes(x = cluster10, y = Expectancy, fill = cluster10)) +
   geom_boxplot(alpha = 0.3) +
   geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
-  geom_text(aes(group = cluster10, 
-                label = ifelse(test = log(Expectancy) > median(log(Expectancy)) 
-                               + 1.5*IQR(log(Expectancy)) | log(Expectancy) < 
-                                 median(log(Expectancy)) - 1.5*IQR(log(Expectancy)), 
+  geom_text_repel(aes(group = cluster10, 
+                label = ifelse(test = Expectancy > median(Expectancy)
+                               + 1.5*IQR(Expectancy) | Expectancy < 
+                                 median(Expectancy) - 1.5*IQR(Expectancy), 
                   yes = ISO3,
                   no = '')), 
             position = position_dodge(width=0.75),
-            hjust = "left", size = 3)
+            hjust = "left", size = 3) + ggtitle("HAC GDP Boxplot") + 
+  xlab("Policy Cluster") + theme(legend.position = "none")
+dev.off()
+```
+```{r}
+## BOXPLOT QUESTIONS
+jpeg(file = "boxplot_h_expectancy.jpg")
+ggplot(master_df_h, 
+       aes(x = cluster10, y = Expectancy, fill = cluster10)) +
+  geom_boxplot(alpha = 0.3) +
+  geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
+  geom_text_repel(aes(group = cluster10, 
+                label = ifelse(test = Expectancy > median(Expectancy)
+                               + 1.5*IQR(Expectancy) | Expectancy < 
+                                 median(Expectancy) - 1.5*IQR(Expectancy), 
+                  yes = ISO3,
+                  no = '')), 
+            position = position_dodge(width=0.75),
+            hjust = "left", size = 3) + ggtitle("HAC GDP Boxplot") + xlab("Policy Cluster") + 
+  theme(legend.position = "none")
+dev.off()
 ```
 
 
 ```{r}
-
+iso3$Alpha.3.code <- trimws(iso3$Alpha.3.code)
+names_h <- merge(master_df_h, iso3, by.x = "ISO3", by.y = "Alpha.3.code")
+names_k <- merge(master_df_k, iso3, by.x = "ISO3", by.y = "Alpha.3.code")
+countries_h <- data.frame()
+countries_k <- rep(NA, 10)
 for (i in 1:10) {
-  print(master_df_h[master_df_h$cluster10 == i, ]$ISO3)
+  names_h[names_h$cluster10 == i, ]$Country
+  names_h[names_k$cluster10 == i, ]$Country
 }
 ```
 
 ```{r}
 #appendix (use xtable to format into Latex)
 # kableExtra
-for (i in 1:10) {
-  print(master_df_k[master_df_k$cluster10 == i, ]$ISO3)
-}
+tb <- split(master_df_k, master_df_k$cluster10)
 ```
 
 
@@ -785,14 +786,55 @@ FINAL OFFICE HOURS:
 - classification tree, multinomial 
 - top two principal components, color code (or focusing on two variables of interest)
 
+```{r}
+demographic_means <- aggregate(cbind(GDP, Pop, Expectancy, Fertility, literacy)~cluster10, 
+                               data = master_df_k, mean)
+demographic_means <- lapply(demographic_means, function(x) if(is.numeric(x)) round(x, 3) else x)
+demographic_means <- data.frame(demographic_means)
+names(demographic_means)[names(demographic_means) == 'cluster10'] <- 'cluster'
+kable(demographic_means, "latex")
+```
 
 ```{r}
-aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
+demographic_means <- aggregate(cbind(GDP, Pop, Expectancy, Fertility, literacy)~cluster10, 
+                               data = master_df_h, mean)
+demographic_means <- lapply(demographic_means, function(x) if(is.numeric(x)) round(x, 3) else x)
+demographic_means <- data.frame(demographic_means)
+names(demographic_means)[names(demographic_means) == 'cluster10'] <- 'cluster'
+kable(demographic_means, "latex")
+```
+
+```{r}
+cluster_means <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
+                HISTORY_BAN_CLEANED,
+                CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_NON, 
+                POLICY_TYPE_COMPLETE, POLICY_TYPE_PARTIAL,
+                AIR, LAND, 
+                SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~cluster10, data = master_df_h, mean)
+cluster_means <- lapply(cluster_means, function(x) if(is.numeric(x)) round(x, 3) else x)
+cluster_means <- data.frame(cluster_means)
+names(cluster_means)[names(cluster_means) == 'cluster10'] <- 'cluster'
+kable(cluster_means[,1:5], format = "latex")
+kable(cluster_means[,c(1,6:9)], format = "latex")
+kable(cluster_means[,c(1,10:13)], format = "latex")
+kable(cluster_means[,c(1,14:15)], format = "latex")
+```
+
+
+```{r}
+cluster_means <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
                 HISTORY_BAN_CLEANED,
                 CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_NON, 
                 POLICY_TYPE_COMPLETE, POLICY_TYPE_PARTIAL,
                 AIR, LAND, 
                 SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~cluster10, data = master_df_k, mean)
+cluster_means <- lapply(cluster_means, function(x) if(is.numeric(x)) round(x, 3) else x)
+cluster_means <- data.frame(cluster_means)
+names(cluster_means)[names(cluster_means) == 'cluster10'] <- 'cluster'
+kable(cluster_means[,1:5], format = "latex")
+kable(cluster_means[,c(1,6:9)], format = "latex")
+kable(cluster_means[,c(1,10:13)], format = "latex")
+kable(cluster_means[,c(1,14:15)], format = "latex")
 ```
 
 ```{r}
