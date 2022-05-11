@@ -386,6 +386,55 @@ literacy_rate <- read.csv('data/demographic/literacy_rate.csv')
 iso3 <- read.csv('data/demographic/iso3.csv')
 ```
 
+
+```{r}
+gdp[gdp$Code == "ABW", ]$GDP = 3202 * 10^6
+gdp[gdp$Code == "AND", ]$GDP = 3155 * 10^6
+gdp[gdp$Code == "ERI", ]$GDP = 2.07 * 10^9
+gdp[gdp$Code == "GIB", ]$GDP = 2885810912.00
+gdp[gdp$Code == "GRL", ]$GDP = 3052 * 10^6
+gdp[gdp$Code == "LIE", ]$GDP = 6839 * 10^6
+gdp[gdp$Code == "MNP", ]$GDP = 1182 * 10^6
+gdp[gdp$Code == "NCL", ]$GDP = 10 * 10^9
+gdp[gdp$Code == "PYF", ]$GDP = 3.45 * 10^9
+gdp[gdp$Code == "SMR", ]$GDP = 1616 * 10^6 
+gdp[gdp$Code == "SSD", ]$GDP = 1119.7 * 10^6 
+gdp[gdp$Code == "TKM", ]$GDP = 45231 * 10^6 
+gdp[gdp$Code == "VEN", ]$GDP = 47.26 * 10^9
+gdp[gdp$Code == "YEM", ]$GDP = 23486 * 10^6
+
+```
+
+```{r}
+life_expectancy[life_expectancy$Code == "AND", ]$Expectancy = 84.5
+life_expectancy[life_expectancy$Code == "ASM", ]$Expectancy = 73.32
+life_expectancy[life_expectancy$Code == "CYM", ]$Expectancy = 82.19
+life_expectancy[life_expectancy$Code == "DMA", ]$Expectancy = 76.6
+life_expectancy[life_expectancy$Code == "GIB", ]$Expectancy = 78.7
+life_expectancy[life_expectancy$Code == "KNA", ]$Expectancy = 71.34
+life_expectancy[life_expectancy$Code == "MCO", ]$Expectancy = 89.4
+life_expectancy[life_expectancy$Code == "MHL", ]$Expectancy = 65.24
+life_expectancy[life_expectancy$Code == "MNP", ]$Expectancy = 77.1
+life_expectancy[life_expectancy$Code == "PLW", ]$Expectancy = 69.13
+life_expectancy[life_expectancy$Code == "SMR", ]$Expectancy = 85.42
+life_expectancy[life_expectancy$Code == "TCA", ]$Expectancy = 80.6
+```
+
+```{r}
+fertility_rate[fertility_rate$Code == "AND", ]$Fertility = 1.3
+fertility_rate[fertility_rate$Code == "ASM", ]$Fertility = 2.28
+fertility_rate[fertility_rate$Code == "CYM", ]$Fertility = 1.83
+fertility_rate[fertility_rate$Code == "DMA", ]$Fertility = 1.9
+fertility_rate[fertility_rate$Code == "GIB", ]$Fertility = 1.91
+fertility_rate[fertility_rate$Code == "KNA", ]$Fertility = 2.1
+fertility_rate[fertility_rate$Code == "MCO", ]$Fertility = 1.52
+fertility_rate[fertility_rate$Code == "MHL", ]$Fertility = 4.5
+fertility_rate[fertility_rate$Code == "MNP", ]$Fertility = 2.66
+fertility_rate[fertility_rate$Code == "PLW", ]$Fertility = 2.21
+fertility_rate[fertility_rate$Code == "SMR", ]$Fertility = 1.3
+fertility_rate[fertility_rate$Code == "TCA", ]$Fertility = 1.7
+```
+
 ```{r}
 # some data cleaning on literacy rate -- need to note how not all of them were pulled from
 # 2020
@@ -695,12 +744,13 @@ ggplot(master_df_h[!is.na(master_df_h$GDP), ], aes(x = cluster10, y = log(GDP), 
 
 ```{r}
 ggplot(master_df_k[!is.na(master_df_k$Expectancy), ], 
-       aes(x = cluster10, y = Expectancy, fill = cluster10)) +
+       aes(x = cluster10, y = log(Expectancy), fill = cluster10)) +
   geom_boxplot(alpha = 0.3) +
   geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
   geom_text(aes(group = cluster10, 
-                label = ifelse(test = Expectancy > median(Expectancy) + 1.5*IQR(Expectancy)
-                               | Expectancy < median(Expectancy) - 1.5*IQR(Expectancy), 
+                label = ifelse(test = log(Expectancy) > median(log(Expectancy)) 
+                               + 1.5*IQR(log(Expectancy)) | log(Expectancy) < 
+                                 median(log(Expectancy)) - 1.5*IQR(log(Expectancy)), 
                   yes = ISO3,
                   no = '')), 
             position = position_dodge(width=0.75),
@@ -736,4 +786,70 @@ FINAL OFFICE HOURS:
 - top two principal components, color code (or focusing on two variables of interest)
 
 
+```{r}
+aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
+                HISTORY_BAN_CLEANED,
+                CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_NON, 
+                POLICY_TYPE_COMPLETE, POLICY_TYPE_PARTIAL,
+                AIR, LAND, 
+                SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~cluster10, data = master_df_k, mean)
+```
+
+```{r}
+# cluster 4 has longest policies
+# cluster 5 has strictest policies against refugees
+# cluster 6 has highest country exception list (and second highest work exception)
+```
+
+
+```{r}
+master_df_k[is.na(master_df_k$GDP),]
+# prob add into the original GDP data frame (so we have it in HAC too)
+# ABW -- 3202 x 10^6
+# AND -- 3155 x 10^6
+# ERI -- 2.07 bil (2011)
+# GIB -- 2,885,810,912.00
+# GRL -- 3052 x 10^6
+# LIE -- 6,839 x 10^6
+# MNP -- 1,182 x 10^6
+# NCL -- 10 bil
+# PYF -- 3.45 bil
+# SMR -- 1616 mil
+# SSD -- 1,119.7 mil
+# TKM -- 45231 mil
+# VEN -- 47.26 bil
+# YEM -- 23,486 mil
+```
+
+```{r}
+master_df_k[is.na(master_df_k$Expectancy),]
+# AND - 84.5
+# ASM - 73.32
+# CYM - 82.19
+# DMA - 76.6
+# GIB - 78.7
+# KNA - 71.34
+# MCO - 89.4
+# MHL - 65.24
+# MNP - 77.1
+# PLW - 69.13
+# SMR - 85.42
+# TCA - 80.6
+```
+
+```{r}
+master_df_k[is.na(master_df_k$Fertility),]
+# AND - 1.3
+# ASM - 2.28
+# CYM - 1.83
+# DMA - 1.9
+# GIB - 1.91
+# KNA - 2.1
+# MCO - 1.52
+# MHL - 4.5
+# MNP - 2.66
+# PLW - 2.21
+# SMR - 1.3
+# TCA - 1.7
+```
 
