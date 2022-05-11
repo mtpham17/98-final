@@ -358,19 +358,26 @@ kcluster_by_country$cluster10 <- as.factor(cluster.results.10$cluster)
 # kcluster_by_country$cluster10 <- as.factor(cluster.results.6$cluster)
 ```
 
+
 ```{r}
-hclust_centroid <- hclust(dist_mat, method = 'centroid')
+# testing if log transformations fix the chaining issue
 
-plot(hclust_avg)
-
-cut_avg10 <- cutree(hclust_centroid, k = 10)
-
-centroid_dend_obj <- as.dendrogram(hclust_centroid, h = 10, leaflab = "none")
-labels(centroid_dend_obj) <- rep(NA, nrow(by_country))
-test <- color_branches(centroid_dend_obj, k = 10)
-plot(test)
+# by_country_test <- data.frame(by_country)
+# ind <- sapply(by_country_test, is.numeric)
+# by_country_test[ind] <- lapply(by_country_test[ind], function(x) log(x + 5))
+# 
+# dist_mat_test <- dist(by_country_test[,2:ncol(by_country_test)], method = 'euclidean')
+# hclust_avg_test <- hclust(dist_mat_test, method = 'average')
+# hclust_cen_test <- hclust(dist_mat_test, method = 'centroid')
+# 
+# test_cut_avg <- cutree(hclust_avg_test, k = 10)
+# test_cut_cen <- cutree(hclust_cen_test, k = 10)
+# 
+# hcluster_test_avg <- mutate(by_country, cluster = test_cut_avg)
+# hcluster_test_cen <- mutate(by_country, cluster = test_cut_cen)
 
 ```
+
 
 ```{r}
 # hierarchical clustering
@@ -848,17 +855,16 @@ for (i in 1:10) {
 }
 ```
 ```{r}
-countries_h <- list()
 for (i in 1:10) {
-  countries_h[[i]] <- names_h[names_h$cluster10 == i, ]$Country
+  print(names_h[names_h$cluster10 == i, ]$Country)
 }
-kable(countries_h, "latex")
+```
 
-countries_k <- list()
+
+```{r}
 for (i in 1:10) {
-  countries_k[[i]] <- names_h[names_h$cluster10 == i, ]$Country
+  print(names_k[names_k$cluster10 == i, ]$Country)
 }
-kable(countries_k, "latex")
 ```
 
 ```{r}

@@ -1026,12 +1026,22 @@ DETERMINING THE LINKAGE CRITERIA:
 \CommentTok{# Hierarchical Agglomerative Clustering}
 \NormalTok{h1=}\KeywordTok{hclust}\NormalTok{(dist_mat,}\DataTypeTok{method=}\StringTok{'average'}\NormalTok{)}
 \NormalTok{h2=}\KeywordTok{hclust}\NormalTok{(dist_mat,}\DataTypeTok{method=}\StringTok{'complete'}\NormalTok{)}
+\NormalTok{h3=}\KeywordTok{hclust}\NormalTok{(dist_mat,}\DataTypeTok{method=}\StringTok{'centroid'}\NormalTok{)}
 \NormalTok{h4=}\KeywordTok{hclust}\NormalTok{(dist_mat,}\DataTypeTok{method=}\StringTok{'single'}\NormalTok{)}
+\NormalTok{h5=}\KeywordTok{hclust}\NormalTok{(dist_mat,}\DataTypeTok{method=}\StringTok{"ward.D"}\NormalTok{)}
+\NormalTok{h6=}\KeywordTok{hclust}\NormalTok{(dist_mat,}\DataTypeTok{method=}\StringTok{"ward.D2"}\NormalTok{)}
+\NormalTok{h7=}\KeywordTok{hclust}\NormalTok{(dist_mat,}\DataTypeTok{method=}\StringTok{"mcquitty"}\NormalTok{)}
+\NormalTok{h8=}\KeywordTok{hclust}\NormalTok{(dist_mat,}\DataTypeTok{method=}\StringTok{"median"}\NormalTok{)}
 
 \CommentTok{# Cophenetic Distances, for each linkage}
 \NormalTok{c1=}\KeywordTok{cophenetic}\NormalTok{(h1)}
 \NormalTok{c2=}\KeywordTok{cophenetic}\NormalTok{(h2)}
+\NormalTok{c3=}\KeywordTok{cophenetic}\NormalTok{(h3)}
 \NormalTok{c4=}\KeywordTok{cophenetic}\NormalTok{(h4)}
+\NormalTok{c5=}\KeywordTok{cophenetic}\NormalTok{(h5)}
+\NormalTok{c6=}\KeywordTok{cophenetic}\NormalTok{(h6)}
+\NormalTok{c7=}\KeywordTok{cophenetic}\NormalTok{(h7)}
+\NormalTok{c8=}\KeywordTok{cophenetic}\NormalTok{(h8)}
 
 \CommentTok{# Correlations}
 \KeywordTok{cor}\NormalTok{(dist_mat,c1) }
@@ -1054,12 +1064,62 @@ DETERMINING THE LINKAGE CRITERIA:
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\KeywordTok{cor}\NormalTok{(dist_mat, c3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.9702574
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \KeywordTok{cor}\NormalTok{(dist_mat,c4)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
 ## [1] 0.9513006
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cor}\NormalTok{(dist_mat,c5)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.8601452
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cor}\NormalTok{(dist_mat, c6)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.8453094
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cor}\NormalTok{(dist_mat,c7)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.8636195
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cor}\NormalTok{(dist_mat,c8)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.942359
 \end{verbatim}
 
 \begin{Shaded}
@@ -1085,6 +1145,29 @@ for now, use 3 clusters (for HAC and k-means)
 \CommentTok{# kcluster_by_country$cluster10 <- as.factor(cluster.results.6$cluster)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{hclust_centroid <-}\StringTok{ }\KeywordTok{hclust}\NormalTok{(dist_mat, }\DataTypeTok{method =} \StringTok{'centroid'}\NormalTok{)}
+
+\KeywordTok{plot}\NormalTok{(hclust_centroid)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{eda_files/figure-latex/unnamed-chunk-17-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cut_avg10 <-}\StringTok{ }\KeywordTok{cutree}\NormalTok{(hclust_centroid, }\DataTypeTok{k =} \DecValTok{10}\NormalTok{)}
+
+\NormalTok{centroid_dend_obj <-}\StringTok{ }\KeywordTok{as.dendrogram}\NormalTok{(hclust_centroid, }\DataTypeTok{h =} \DecValTok{10}\NormalTok{, }\DataTypeTok{leaflab =} \StringTok{"none"}\NormalTok{)}
+\KeywordTok{labels}\NormalTok{(centroid_dend_obj) <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\OtherTok{NA}\NormalTok{, }\KeywordTok{nrow}\NormalTok{(by_country))}
+\NormalTok{test <-}\StringTok{ }\KeywordTok{color_branches}\NormalTok{(centroid_dend_obj, }\DataTypeTok{k =} \DecValTok{10}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(test)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{eda_files/figure-latex/unnamed-chunk-17-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1511,7 +1594,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-29-1.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-30-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1521,7 +1604,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-29-2.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-30-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1531,7 +1614,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-29-3.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-30-3.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1541,7 +1624,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-29-4.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-30-4.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1551,7 +1634,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-29-5.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-30-5.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1561,7 +1644,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-29-6.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-30-6.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1571,7 +1654,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-29-7.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-30-7.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1581,7 +1664,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-29-8.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-30-8.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1591,7 +1674,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-29-9.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-30-9.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1601,7 +1684,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-29-10.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-30-10.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1623,7 +1706,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-30-1.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-31-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1633,7 +1716,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-30-2.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-31-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1643,7 +1726,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-30-3.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-31-3.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1653,7 +1736,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-30-4.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-31-4.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1663,7 +1746,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-30-5.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-31-5.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1673,7 +1756,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-30-6.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-31-6.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1683,7 +1766,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-30-7.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-31-7.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1693,7 +1776,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-30-8.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-31-8.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1703,7 +1786,7 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-30-9.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-31-9.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1713,24 +1796,84 @@ development.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{eda_files/figure-latex/unnamed-chunk-30-10.pdf}
+\includegraphics{eda_files/figure-latex/unnamed-chunk-31-10.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# manually label outliers -- df_k literacy}
+\NormalTok{master_df_k}\OperatorTok{$}\NormalTok{outlier_literacy <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\KeywordTok{nrow}\NormalTok{(master_df_k))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{) \{}
+\NormalTok{  med =}\StringTok{ }\KeywordTok{median}\NormalTok{(master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{literacy)}
+\NormalTok{  iqr =}\StringTok{ }\KeywordTok{IQR}\NormalTok{(master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{literacy)}
+\NormalTok{  master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{outlier_literacy <-}\StringTok{ }
+\StringTok{    }\NormalTok{(master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{literacy }\OperatorTok{>}\StringTok{ }\NormalTok{med }\OperatorTok{+}\StringTok{ }\FloatTok{1.5} \OperatorTok{*}\StringTok{ }\NormalTok{iqr) }\OperatorTok{|}
+\StringTok{    }\NormalTok{(master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{literacy }\OperatorTok{<}\StringTok{ }\NormalTok{med }\OperatorTok{-}\StringTok{ }\FloatTok{1.5} \OperatorTok{*}\StringTok{ }\NormalTok{iqr)}
+\NormalTok{\}}
+
+\CommentTok{# df_k fertility}
+
+\NormalTok{master_df_k}\OperatorTok{$}\NormalTok{outlier_fertility <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\KeywordTok{nrow}\NormalTok{(master_df_k))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{) \{}
+\NormalTok{  med =}\StringTok{ }\KeywordTok{median}\NormalTok{(master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Fertility)}
+\NormalTok{  iqr =}\StringTok{ }\KeywordTok{IQR}\NormalTok{(master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Fertility)}
+\NormalTok{  master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{outlier_fertility <-}\StringTok{ }
+\StringTok{    }\NormalTok{(master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Fertility }\OperatorTok{>}\StringTok{ }\NormalTok{med }\OperatorTok{+}\StringTok{ }\FloatTok{1.5} \OperatorTok{*}\StringTok{ }\NormalTok{iqr) }\OperatorTok{|}
+\StringTok{    }\NormalTok{(master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Fertility }\OperatorTok{<}\StringTok{ }\NormalTok{med }\OperatorTok{-}\StringTok{ }\FloatTok{1.5} \OperatorTok{*}\StringTok{ }\NormalTok{iqr)}
+\NormalTok{\}}
+
+\CommentTok{# df_k expectancy}
+
+\NormalTok{master_df_k}\OperatorTok{$}\NormalTok{outlier_expectancy <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\KeywordTok{nrow}\NormalTok{(master_df_k))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{) \{}
+\NormalTok{  med =}\StringTok{ }\KeywordTok{median}\NormalTok{(master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Expectancy)}
+\NormalTok{  iqr =}\StringTok{ }\KeywordTok{IQR}\NormalTok{(master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Expectancy)}
+\NormalTok{  master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{outlier_expectancy <-}\StringTok{ }
+\StringTok{    }\NormalTok{(master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Expectancy}\OperatorTok{>}\StringTok{ }\NormalTok{med }\OperatorTok{+}\StringTok{ }\FloatTok{1.5} \OperatorTok{*}\StringTok{ }\NormalTok{iqr) }\OperatorTok{|}
+\StringTok{    }\NormalTok{(master_df_k[master_df_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Expectancy }\OperatorTok{<}\StringTok{ }\NormalTok{med }\OperatorTok{-}\StringTok{ }\FloatTok{1.5} \OperatorTok{*}\StringTok{ }\NormalTok{iqr)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# outliers for df_h}
+
+\NormalTok{master_df_h}\OperatorTok{$}\NormalTok{outlier_expectancy <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\KeywordTok{nrow}\NormalTok{(master_df_h))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{) \{}
+\NormalTok{  med =}\StringTok{ }\KeywordTok{median}\NormalTok{(master_df_k[master_df_h}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Expectancy)}
+\NormalTok{  iqr =}\StringTok{ }\KeywordTok{IQR}\NormalTok{(master_df_k[master_df_h}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Expectancy)}
+\NormalTok{  master_df_h[master_df_h}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{outlier_expectancy <-}\StringTok{ }
+\StringTok{    }\NormalTok{(master_df_h[master_df_h}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Expectancy}\OperatorTok{>}\StringTok{ }\NormalTok{med }\OperatorTok{+}\StringTok{ }\FloatTok{1.5} \OperatorTok{*}\StringTok{ }\NormalTok{iqr) }\OperatorTok{|}
+\StringTok{    }\NormalTok{(master_df_h[master_df_h}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Expectancy }\OperatorTok{<}\StringTok{ }\NormalTok{med }\OperatorTok{-}\StringTok{ }\FloatTok{1.5} \OperatorTok{*}\StringTok{ }\NormalTok{iqr)}
+\NormalTok{\}}
+
+\NormalTok{master_df_h}\OperatorTok{$}\NormalTok{outlier_gdp <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\KeywordTok{nrow}\NormalTok{(master_df_h))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{) \{}
+\NormalTok{  med =}\StringTok{ }\KeywordTok{median}\NormalTok{(}\KeywordTok{log}\NormalTok{(master_df_k[master_df_h}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{GDP))}
+\NormalTok{  iqr =}\StringTok{ }\KeywordTok{IQR}\NormalTok{(}\KeywordTok{log}\NormalTok{(master_df_k[master_df_h}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{GDP))}
+\NormalTok{  master_df_h[master_df_h}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{outlier_gdp <-}\StringTok{ }
+\StringTok{    }\NormalTok{(}\KeywordTok{log}\NormalTok{(master_df_h[master_df_h}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{GDP) }\OperatorTok{>}\StringTok{ }\NormalTok{med }\OperatorTok{+}\StringTok{ }\FloatTok{1.5} \OperatorTok{*}\StringTok{ }\NormalTok{iqr) }\OperatorTok{|}
+\StringTok{    }\NormalTok{(}\KeywordTok{log}\NormalTok{(master_df_h[master_df_h}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{GDP) }\OperatorTok{<}\StringTok{ }\NormalTok{med }\OperatorTok{-}\StringTok{ }\FloatTok{1.5} \OperatorTok{*}\StringTok{ }\NormalTok{iqr)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# not sure how meaningful something like this would be? definitely needs some cleaning up}
 \CommentTok{# source of code: https://stackoverflow.com/questions/47842646/labelling-outliers-with-ggplot}
 \KeywordTok{jpeg}\NormalTok{(}\DataTypeTok{file=}\StringTok{"boxplot_k_literacy.jpg"}\NormalTok{)}
+\CommentTok{# do this manually}
 \KeywordTok{ggplot}\NormalTok{(master_df_k, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ cluster10, }\DataTypeTok{y =}\NormalTok{ literacy, }\DataTypeTok{fill =}\NormalTok{ cluster10)) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_boxplot}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.3}\NormalTok{) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{color =}\NormalTok{ cluster10, }\DataTypeTok{group =}\NormalTok{ cluster10), }\DataTypeTok{position =} \KeywordTok{position_dodge}\NormalTok{(}\DataTypeTok{width=}\FloatTok{0.75}\NormalTok{)) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_text_repel}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{group =}\NormalTok{ cluster10, }
-                \DataTypeTok{label =} \KeywordTok{ifelse}\NormalTok{(}\DataTypeTok{test =}\NormalTok{ literacy }\OperatorTok{>}\StringTok{ }\KeywordTok{median}\NormalTok{(literacy) }\OperatorTok{+}\StringTok{ }\FloatTok{1.5}\OperatorTok{*}\KeywordTok{IQR}\NormalTok{(literacy)}
-                               \OperatorTok{|}\StringTok{ }\NormalTok{literacy }\OperatorTok{<}\StringTok{ }\KeywordTok{median}\NormalTok{(literacy) }\OperatorTok{-}\StringTok{ }\FloatTok{1.5}\OperatorTok{*}\KeywordTok{IQR}\NormalTok{(literacy), }
+                \DataTypeTok{label =} \KeywordTok{ifelse}\NormalTok{(outlier_literacy, }
                   \DataTypeTok{yes =}\NormalTok{ ISO3,}
                   \DataTypeTok{no =} \StringTok{''}\NormalTok{)), }
             \DataTypeTok{position =} \KeywordTok{position_dodge}\NormalTok{(}\DataTypeTok{width=}\FloatTok{0.75}\NormalTok{),}
-            \DataTypeTok{hjust =} \StringTok{"left"}\NormalTok{, }\DataTypeTok{size =} \DecValTok{3}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"HAC GDP Boxplot"}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Policy Cluster"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+            \DataTypeTok{hjust =} \StringTok{"left"}\NormalTok{, }\DataTypeTok{size =} \DecValTok{3}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"HAC Literacy Boxplot"}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Policy Cluster"}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
 \KeywordTok{dev.off}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
@@ -1747,8 +1890,7 @@ development.
 \StringTok{  }\KeywordTok{geom_boxplot}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.3}\NormalTok{) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{color =}\NormalTok{ cluster10, }\DataTypeTok{group =}\NormalTok{ cluster10), }\DataTypeTok{position =} \KeywordTok{position_dodge}\NormalTok{(}\DataTypeTok{width=}\FloatTok{0.75}\NormalTok{)) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_text_repel}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{group =}\NormalTok{ cluster10, }
-                \DataTypeTok{label =} \KeywordTok{ifelse}\NormalTok{(}\DataTypeTok{test =}\NormalTok{ Fertility }\OperatorTok{>}\StringTok{ }\KeywordTok{median}\NormalTok{(Fertility) }\OperatorTok{+}\StringTok{ }\FloatTok{1.5}\OperatorTok{*}\KeywordTok{IQR}\NormalTok{(Fertility)}
-                               \OperatorTok{|}\StringTok{ }\NormalTok{Fertility }\OperatorTok{<}\StringTok{ }\KeywordTok{median}\NormalTok{(Fertility) }\OperatorTok{-}\StringTok{ }\FloatTok{1.5}\OperatorTok{*}\KeywordTok{IQR}\NormalTok{(Fertility), }
+                \DataTypeTok{label =} \KeywordTok{ifelse}\NormalTok{(outlier_fertility,}
                   \DataTypeTok{yes =}\NormalTok{ ISO3,}
                   \DataTypeTok{no =} \StringTok{''}\NormalTok{)), }
             \DataTypeTok{position =} \KeywordTok{position_dodge}\NormalTok{(}\DataTypeTok{width=}\FloatTok{0.75}\NormalTok{),}
@@ -1772,8 +1914,7 @@ development.
 \StringTok{  }\KeywordTok{geom_boxplot}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.3}\NormalTok{) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{color =}\NormalTok{ cluster10, }\DataTypeTok{group =}\NormalTok{ cluster10), }\DataTypeTok{position =} \KeywordTok{position_dodge}\NormalTok{(}\DataTypeTok{width=}\FloatTok{0.75}\NormalTok{)) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_text_repel}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{group =}\NormalTok{ cluster10, }
-                \DataTypeTok{label =} \KeywordTok{ifelse}\NormalTok{(}\DataTypeTok{test =} \KeywordTok{log}\NormalTok{(GDP) }\OperatorTok{>}\StringTok{ }\KeywordTok{median}\NormalTok{(}\KeywordTok{log}\NormalTok{(GDP)) }\OperatorTok{+}\StringTok{ }\FloatTok{1.5}\OperatorTok{*}\KeywordTok{IQR}\NormalTok{(}\KeywordTok{log}\NormalTok{(GDP))}
-                               \OperatorTok{|}\StringTok{ }\KeywordTok{log}\NormalTok{(GDP) }\OperatorTok{<}\StringTok{ }\KeywordTok{median}\NormalTok{(}\KeywordTok{log}\NormalTok{(GDP)) }\OperatorTok{-}\StringTok{ }\FloatTok{1.5}\OperatorTok{*}\KeywordTok{IQR}\NormalTok{(}\KeywordTok{log}\NormalTok{(GDP)), }
+                \DataTypeTok{label =} \KeywordTok{ifelse}\NormalTok{(outlier_gdp, }
                   \DataTypeTok{yes =}\NormalTok{ ISO3,}
                   \DataTypeTok{no =} \StringTok{''}\NormalTok{)), }
             \DataTypeTok{position =} \KeywordTok{position_dodge}\NormalTok{(}\DataTypeTok{width=}\FloatTok{0.75}\NormalTok{),}
@@ -1803,9 +1944,7 @@ development.
 \StringTok{  }\KeywordTok{geom_boxplot}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.3}\NormalTok{) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{color =}\NormalTok{ cluster10, }\DataTypeTok{group =}\NormalTok{ cluster10), }\DataTypeTok{position =} \KeywordTok{position_dodge}\NormalTok{(}\DataTypeTok{width=}\FloatTok{0.75}\NormalTok{)) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_text_repel}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{group =}\NormalTok{ cluster10, }
-                \DataTypeTok{label =} \KeywordTok{ifelse}\NormalTok{(}\DataTypeTok{test =}\NormalTok{ Expectancy }\OperatorTok{>}\StringTok{ }\KeywordTok{median}\NormalTok{(Expectancy)}
-                               \OperatorTok{+}\StringTok{ }\FloatTok{1.5}\OperatorTok{*}\KeywordTok{IQR}\NormalTok{(Expectancy) }\OperatorTok{|}\StringTok{ }\NormalTok{Expectancy }\OperatorTok{<}\StringTok{ }
-\StringTok{                                 }\KeywordTok{median}\NormalTok{(Expectancy) }\OperatorTok{-}\StringTok{ }\FloatTok{1.5}\OperatorTok{*}\KeywordTok{IQR}\NormalTok{(Expectancy), }
+                \DataTypeTok{label =} \KeywordTok{ifelse}\NormalTok{(outlier_expectancy, }
                   \DataTypeTok{yes =}\NormalTok{ ISO3,}
                   \DataTypeTok{no =} \StringTok{''}\NormalTok{)), }
             \DataTypeTok{position =} \KeywordTok{position_dodge}\NormalTok{(}\DataTypeTok{width=}\FloatTok{0.75}\NormalTok{),}
@@ -1829,9 +1968,7 @@ development.
 \StringTok{  }\KeywordTok{geom_boxplot}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.3}\NormalTok{) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{color =}\NormalTok{ cluster10, }\DataTypeTok{group =}\NormalTok{ cluster10), }\DataTypeTok{position =} \KeywordTok{position_dodge}\NormalTok{(}\DataTypeTok{width=}\FloatTok{0.75}\NormalTok{)) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_text_repel}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{group =}\NormalTok{ cluster10, }
-                \DataTypeTok{label =} \KeywordTok{ifelse}\NormalTok{(}\DataTypeTok{test =}\NormalTok{ Expectancy }\OperatorTok{>}\StringTok{ }\KeywordTok{median}\NormalTok{(Expectancy)}
-                               \OperatorTok{+}\StringTok{ }\FloatTok{1.5}\OperatorTok{*}\KeywordTok{IQR}\NormalTok{(Expectancy) }\OperatorTok{|}\StringTok{ }\NormalTok{Expectancy }\OperatorTok{<}\StringTok{ }
-\StringTok{                                 }\KeywordTok{median}\NormalTok{(Expectancy) }\OperatorTok{-}\StringTok{ }\FloatTok{1.5}\OperatorTok{*}\KeywordTok{IQR}\NormalTok{(Expectancy), }
+                \DataTypeTok{label =} \KeywordTok{ifelse}\NormalTok{(outlier_expectancy, }
                   \DataTypeTok{yes =}\NormalTok{ ISO3,}
                   \DataTypeTok{no =} \StringTok{''}\NormalTok{)), }
             \DataTypeTok{position =} \KeywordTok{position_dodge}\NormalTok{(}\DataTypeTok{width=}\FloatTok{0.75}\NormalTok{),}
@@ -1854,14 +1991,1154 @@ development.
 \NormalTok{countries_h <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{()}
 \NormalTok{countries_k <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\OtherTok{NA}\NormalTok{, }\DecValTok{10}\NormalTok{)}
 \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{) \{}
-\NormalTok{  names_h[names_h}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Country}
-\NormalTok{  names_h[names_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Country}
+  \KeywordTok{print}\NormalTok{(names_h[names_h}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Country)}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+##   [1] "Aruba"                             "Afghanistan"                      
+##   [3] "Angola"                            "Albania"                          
+##   [5] "United Arab Emirates"              "Argentina"                        
+##   [7] "Armenia"                           "American Samoa"                   
+##   [9] "Antigua and Barbuda"               "Australia"                        
+##  [11] "Austria"                           "Azerbaijan"                       
+##  [13] "Burundi"                           "Belgium"                          
+##  [15] "Benin"                             "Burkina Faso"                     
+##  [17] "Bangladesh"                        "Bulgaria"                         
+##  [19] "Bahrain"                           "Bahamas"                          
+##  [21] "Bosnia and Herzegovina"            "Belize"                           
+##  [23] "Bolivia"                           "Bolivia, Plurinational State of"  
+##  [25] "Brazil"                            "Brunei Darussalam"                
+##  [27] "Brunei"                            "Botswana"                         
+##  [29] "Central African Republic"          "Canada"                           
+##  [31] "Switzerland"                       "Chile"                            
+##  [33] "China"                             "Ivory Coast"                      
+##  [35] "Côte d'Ivoire"                     "Colombia"                         
+##  [37] "Comoros"                           "Cape Verde"                       
+##  [39] "Costa Rica"                        "Cuba"                             
+##  [41] "Cayman Islands"                    "Germany"                          
+##  [43] "Djibouti"                          "Dominica"                         
+##  [45] "Denmark"                           "Dominican Republic"               
+##  [47] "Algeria"                           "Ecuador"                          
+##  [49] "Egypt"                             "Eritrea"                          
+##  [51] "Spain"                             "Estonia"                          
+##  [53] "Finland"                           "Fiji"                             
+##  [55] "France"                            "Gabon"                            
+##  [57] "United Kingdom"                    "Georgia"                          
+##  [59] "Ghana"                             "Gibraltar"                        
+##  [61] "Guinea"                            "Gambia"                           
+##  [63] "Guinea-Bissau"                     "Equatorial Guinea"                
+##  [65] "Greece"                            "Grenada"                          
+##  [67] "Greenland"                         "Guatemala"                        
+##  [69] "Hong Kong"                         "Honduras"                         
+##  [71] "Croatia"                           "Haiti"                            
+##  [73] "Hungary"                           "Indonesia"                        
+##  [75] "India"                             "Iraq"                             
+##  [77] "Iceland"                           "Israel"                           
+##  [79] "Jamaica"                           "Jordan"                           
+##  [81] "Kenya"                             "Kyrgyzstan"                       
+##  [83] "Cambodia"                          "Saint Kitts and Nevis"            
+##  [85] "Korea, Republic of"                "South Korea"                      
+##  [87] "Kuwait"                            "Lebanon"                          
+##  [89] "Libya"                             "Libyan Arab Jamahiriya"           
+##  [91] "Saint Lucia"                       "Sri Lanka"                        
+##  [93] "Lesotho"                           "Lithuania"                        
+##  [95] "Luxembourg"                        "Latvia"                           
+##  [97] "Morocco"                           "Madagascar"                       
+##  [99] "Maldives"                          "Marshall Islands"                 
+## [101] "Mali"                              "Malta"                            
+## [103] "Montenegro"                        "Mongolia"                         
+## [105] "Northern Mariana Islands"          "Mozambique"                       
+## [107] "Mauritania"                        "Mauritius"                        
+## [109] "Malawi"                            "Malaysia"                         
+## [111] "Namibia"                           "Nigeria"                          
+## [113] "Nicaragua"                         "Netherlands"                      
+## [115] "Norway"                            "Nepal"                            
+## [117] "Oman"                              "Pakistan"                         
+## [119] "Panama"                            "Peru"                             
+## [121] "Philippines"                       "Palau"                            
+## [123] "Papua New Guinea"                  "Poland"                           
+## [125] "Portugal"                          "Paraguay"                         
+## [127] "French Polynesia"                  "Qatar"                            
+## [129] "Romania"                           "Russia"                           
+## [131] "Russian Federation"                "Rwanda"                           
+## [133] "Saudi Arabia"                      "Sudan"                            
+## [135] "Senegal"                           "Singapore"                        
+## [137] "Solomon Islands"                   "Sierra Leone"                     
+## [139] "El Salvador"                       "Somalia"                          
+## [141] "Serbia"                            "South Sudan"                      
+## [143] "Sao Tome and Principe"             "Suriname"                         
+## [145] "Slovakia"                          "Slovenia"                         
+## [147] "Sweden"                            "Seychelles"                       
+## [149] "Turks and Caicos Islands"          "Chad"                             
+## [151] "Togo"                              "Thailand"                         
+## [153] "Turkmenistan"                      "Tonga"                            
+## [155] "Trinidad and Tobago"               "Tunisia"                          
+## [157] "Turkey"                            "Uganda"                           
+## [159] "Ukraine"                           "Uruguay"                          
+## [161] "Uzbekistan"                        "Venezuela, Bolivarian Republic of"
+## [163] "Venezuela"                         "Vietnam"                          
+## [165] "Viet Nam"                          "Vanuatu"                          
+## [167] "Yemen"                             "South Africa"                     
+## [169] "Zimbabwe"                         
+## [1] "Andorra"     "Guam"        "Monaco"      "Puerto Rico" "San Marino" 
+## [1] "Belarus"    "Bhutan"     "Ethiopia"   "Guyana"     "Kazakhstan"
+## [6] "Liberia"    "Mexico"     "Niger"      "Tajikistan"
+## [1] "Bermuda"  "Barbados" "Cameroon" "Samoa"   
+## [1] "Cyprus" "Italy"  "Japan" 
+## character(0)
+## [1] "Ireland"
+## [1] "Burma"         "Myanmar"       "New Zealand"   "United States"
+## [5] "Zambia"       
+## [1] "Liechtenstein"
+## [1] "New Caledonia"
+\end{verbatim}
+
 \begin{Shaded}
 \begin{Highlighting}[]
+\NormalTok{countries_h <-}\StringTok{ }\KeywordTok{list}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{) \{}
+\NormalTok{  countries_h[[i]] <-}\StringTok{ }\NormalTok{names_h[names_h}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Country}
+\NormalTok{\}}
+\KeywordTok{kable}\NormalTok{(countries_h, }\StringTok{"latex"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}
+
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Aruba\\
+\hline
+Afghanistan\\
+\hline
+Angola\\
+\hline
+Albania\\
+\hline
+United Arab Emirates\\
+\hline
+Argentina\\
+\hline
+Armenia\\
+\hline
+American Samoa\\
+\hline
+Antigua and Barbuda\\
+\hline
+Australia\\
+\hline
+Austria\\
+\hline
+Azerbaijan\\
+\hline
+Burundi\\
+\hline
+Belgium\\
+\hline
+Benin\\
+\hline
+Burkina Faso\\
+\hline
+Bangladesh\\
+\hline
+Bulgaria\\
+\hline
+Bahrain\\
+\hline
+Bahamas\\
+\hline
+Bosnia and Herzegovina\\
+\hline
+Belize\\
+\hline
+Bolivia\\
+\hline
+Bolivia, Plurinational State of\\
+\hline
+Brazil\\
+\hline
+Brunei Darussalam\\
+\hline
+Brunei\\
+\hline
+Botswana\\
+\hline
+Central African Republic\\
+\hline
+Canada\\
+\hline
+Switzerland\\
+\hline
+Chile\\
+\hline
+China\\
+\hline
+Ivory Coast\\
+\hline
+Côte d'Ivoire\\
+\hline
+Colombia\\
+\hline
+Comoros\\
+\hline
+Cape Verde\\
+\hline
+Costa Rica\\
+\hline
+Cuba\\
+\hline
+Cayman Islands\\
+\hline
+Germany\\
+\hline
+Djibouti\\
+\hline
+Dominica\\
+\hline
+Denmark\\
+\hline
+Dominican Republic\\
+\hline
+Algeria\\
+\hline
+Ecuador\\
+\hline
+Egypt\\
+\hline
+Eritrea\\
+\hline
+Spain\\
+\hline
+Estonia\\
+\hline
+Finland\\
+\hline
+Fiji\\
+\hline
+France\\
+\hline
+Gabon\\
+\hline
+United Kingdom\\
+\hline
+Georgia\\
+\hline
+Ghana\\
+\hline
+Gibraltar\\
+\hline
+Guinea\\
+\hline
+Gambia\\
+\hline
+Guinea-Bissau\\
+\hline
+Equatorial Guinea\\
+\hline
+Greece\\
+\hline
+Grenada\\
+\hline
+Greenland\\
+\hline
+Guatemala\\
+\hline
+Hong Kong\\
+\hline
+Honduras\\
+\hline
+Croatia\\
+\hline
+Haiti\\
+\hline
+Hungary\\
+\hline
+Indonesia\\
+\hline
+India\\
+\hline
+Iraq\\
+\hline
+Iceland\\
+\hline
+Israel\\
+\hline
+Jamaica\\
+\hline
+Jordan\\
+\hline
+Kenya\\
+\hline
+Kyrgyzstan\\
+\hline
+Cambodia\\
+\hline
+Saint Kitts and Nevis\\
+\hline
+Korea, Republic of\\
+\hline
+South Korea\\
+\hline
+Kuwait\\
+\hline
+Lebanon\\
+\hline
+Libya\\
+\hline
+Libyan Arab Jamahiriya\\
+\hline
+Saint Lucia\\
+\hline
+Sri Lanka\\
+\hline
+Lesotho\\
+\hline
+Lithuania\\
+\hline
+Luxembourg\\
+\hline
+Latvia\\
+\hline
+Morocco\\
+\hline
+Madagascar\\
+\hline
+Maldives\\
+\hline
+Marshall Islands\\
+\hline
+Mali\\
+\hline
+Malta\\
+\hline
+Montenegro\\
+\hline
+Mongolia\\
+\hline
+Northern Mariana Islands\\
+\hline
+Mozambique\\
+\hline
+Mauritania\\
+\hline
+Mauritius\\
+\hline
+Malawi\\
+\hline
+Malaysia\\
+\hline
+Namibia\\
+\hline
+Nigeria\\
+\hline
+Nicaragua\\
+\hline
+Netherlands\\
+\hline
+Norway\\
+\hline
+Nepal\\
+\hline
+Oman\\
+\hline
+Pakistan\\
+\hline
+Panama\\
+\hline
+Peru\\
+\hline
+Philippines\\
+\hline
+Palau\\
+\hline
+Papua New Guinea\\
+\hline
+Poland\\
+\hline
+Portugal\\
+\hline
+Paraguay\\
+\hline
+French Polynesia\\
+\hline
+Qatar\\
+\hline
+Romania\\
+\hline
+Russia\\
+\hline
+Russian Federation\\
+\hline
+Rwanda\\
+\hline
+Saudi Arabia\\
+\hline
+Sudan\\
+\hline
+Senegal\\
+\hline
+Singapore\\
+\hline
+Solomon Islands\\
+\hline
+Sierra Leone\\
+\hline
+El Salvador\\
+\hline
+Somalia\\
+\hline
+Serbia\\
+\hline
+South Sudan\\
+\hline
+Sao Tome and Principe\\
+\hline
+Suriname\\
+\hline
+Slovakia\\
+\hline
+Slovenia\\
+\hline
+Sweden\\
+\hline
+Seychelles\\
+\hline
+Turks and Caicos Islands\\
+\hline
+Chad\\
+\hline
+Togo\\
+\hline
+Thailand\\
+\hline
+Turkmenistan\\
+\hline
+Tonga\\
+\hline
+Trinidad and Tobago\\
+\hline
+Tunisia\\
+\hline
+Turkey\\
+\hline
+Uganda\\
+\hline
+Ukraine\\
+\hline
+Uruguay\\
+\hline
+Uzbekistan\\
+\hline
+Venezuela, Bolivarian Republic of\\
+\hline
+Venezuela\\
+\hline
+Vietnam\\
+\hline
+Viet Nam\\
+\hline
+Vanuatu\\
+\hline
+Yemen\\
+\hline
+South Africa\\
+\hline
+Zimbabwe\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Andorra\\
+\hline
+Guam\\
+\hline
+Monaco\\
+\hline
+Puerto Rico\\
+\hline
+San Marino\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Belarus\\
+\hline
+Bhutan\\
+\hline
+Ethiopia\\
+\hline
+Guyana\\
+\hline
+Kazakhstan\\
+\hline
+Liberia\\
+\hline
+Mexico\\
+\hline
+Niger\\
+\hline
+Tajikistan\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Bermuda\\
+\hline
+Barbados\\
+\hline
+Cameroon\\
+\hline
+Samoa\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Cyprus\\
+\hline
+Italy\\
+\hline
+Japan\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+
+
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Ireland\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Burma\\
+\hline
+Myanmar\\
+\hline
+New Zealand\\
+\hline
+United States\\
+\hline
+Zambia\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Liechtenstein\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+New Caledonia\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{countries_k <-}\StringTok{ }\KeywordTok{list}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{) \{}
+\NormalTok{  countries_k[[i]] <-}\StringTok{ }\NormalTok{names_h[names_h}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Country}
+\NormalTok{\}}
+\KeywordTok{kable}\NormalTok{(countries_k, }\StringTok{"latex"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}
+
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Aruba\\
+\hline
+Afghanistan\\
+\hline
+Angola\\
+\hline
+Albania\\
+\hline
+United Arab Emirates\\
+\hline
+Argentina\\
+\hline
+Armenia\\
+\hline
+American Samoa\\
+\hline
+Antigua and Barbuda\\
+\hline
+Australia\\
+\hline
+Austria\\
+\hline
+Azerbaijan\\
+\hline
+Burundi\\
+\hline
+Belgium\\
+\hline
+Benin\\
+\hline
+Burkina Faso\\
+\hline
+Bangladesh\\
+\hline
+Bulgaria\\
+\hline
+Bahrain\\
+\hline
+Bahamas\\
+\hline
+Bosnia and Herzegovina\\
+\hline
+Belize\\
+\hline
+Bolivia\\
+\hline
+Bolivia, Plurinational State of\\
+\hline
+Brazil\\
+\hline
+Brunei Darussalam\\
+\hline
+Brunei\\
+\hline
+Botswana\\
+\hline
+Central African Republic\\
+\hline
+Canada\\
+\hline
+Switzerland\\
+\hline
+Chile\\
+\hline
+China\\
+\hline
+Ivory Coast\\
+\hline
+Côte d'Ivoire\\
+\hline
+Colombia\\
+\hline
+Comoros\\
+\hline
+Cape Verde\\
+\hline
+Costa Rica\\
+\hline
+Cuba\\
+\hline
+Cayman Islands\\
+\hline
+Germany\\
+\hline
+Djibouti\\
+\hline
+Dominica\\
+\hline
+Denmark\\
+\hline
+Dominican Republic\\
+\hline
+Algeria\\
+\hline
+Ecuador\\
+\hline
+Egypt\\
+\hline
+Eritrea\\
+\hline
+Spain\\
+\hline
+Estonia\\
+\hline
+Finland\\
+\hline
+Fiji\\
+\hline
+France\\
+\hline
+Gabon\\
+\hline
+United Kingdom\\
+\hline
+Georgia\\
+\hline
+Ghana\\
+\hline
+Gibraltar\\
+\hline
+Guinea\\
+\hline
+Gambia\\
+\hline
+Guinea-Bissau\\
+\hline
+Equatorial Guinea\\
+\hline
+Greece\\
+\hline
+Grenada\\
+\hline
+Greenland\\
+\hline
+Guatemala\\
+\hline
+Hong Kong\\
+\hline
+Honduras\\
+\hline
+Croatia\\
+\hline
+Haiti\\
+\hline
+Hungary\\
+\hline
+Indonesia\\
+\hline
+India\\
+\hline
+Iraq\\
+\hline
+Iceland\\
+\hline
+Israel\\
+\hline
+Jamaica\\
+\hline
+Jordan\\
+\hline
+Kenya\\
+\hline
+Kyrgyzstan\\
+\hline
+Cambodia\\
+\hline
+Saint Kitts and Nevis\\
+\hline
+Korea, Republic of\\
+\hline
+South Korea\\
+\hline
+Kuwait\\
+\hline
+Lebanon\\
+\hline
+Libya\\
+\hline
+Libyan Arab Jamahiriya\\
+\hline
+Saint Lucia\\
+\hline
+Sri Lanka\\
+\hline
+Lesotho\\
+\hline
+Lithuania\\
+\hline
+Luxembourg\\
+\hline
+Latvia\\
+\hline
+Morocco\\
+\hline
+Madagascar\\
+\hline
+Maldives\\
+\hline
+Marshall Islands\\
+\hline
+Mali\\
+\hline
+Malta\\
+\hline
+Montenegro\\
+\hline
+Mongolia\\
+\hline
+Northern Mariana Islands\\
+\hline
+Mozambique\\
+\hline
+Mauritania\\
+\hline
+Mauritius\\
+\hline
+Malawi\\
+\hline
+Malaysia\\
+\hline
+Namibia\\
+\hline
+Nigeria\\
+\hline
+Nicaragua\\
+\hline
+Netherlands\\
+\hline
+Norway\\
+\hline
+Nepal\\
+\hline
+Oman\\
+\hline
+Pakistan\\
+\hline
+Panama\\
+\hline
+Peru\\
+\hline
+Philippines\\
+\hline
+Palau\\
+\hline
+Papua New Guinea\\
+\hline
+Poland\\
+\hline
+Portugal\\
+\hline
+Paraguay\\
+\hline
+French Polynesia\\
+\hline
+Qatar\\
+\hline
+Romania\\
+\hline
+Russia\\
+\hline
+Russian Federation\\
+\hline
+Rwanda\\
+\hline
+Saudi Arabia\\
+\hline
+Sudan\\
+\hline
+Senegal\\
+\hline
+Singapore\\
+\hline
+Solomon Islands\\
+\hline
+Sierra Leone\\
+\hline
+El Salvador\\
+\hline
+Somalia\\
+\hline
+Serbia\\
+\hline
+South Sudan\\
+\hline
+Sao Tome and Principe\\
+\hline
+Suriname\\
+\hline
+Slovakia\\
+\hline
+Slovenia\\
+\hline
+Sweden\\
+\hline
+Seychelles\\
+\hline
+Turks and Caicos Islands\\
+\hline
+Chad\\
+\hline
+Togo\\
+\hline
+Thailand\\
+\hline
+Turkmenistan\\
+\hline
+Tonga\\
+\hline
+Trinidad and Tobago\\
+\hline
+Tunisia\\
+\hline
+Turkey\\
+\hline
+Uganda\\
+\hline
+Ukraine\\
+\hline
+Uruguay\\
+\hline
+Uzbekistan\\
+\hline
+Venezuela, Bolivarian Republic of\\
+\hline
+Venezuela\\
+\hline
+Vietnam\\
+\hline
+Viet Nam\\
+\hline
+Vanuatu\\
+\hline
+Yemen\\
+\hline
+South Africa\\
+\hline
+Zimbabwe\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Andorra\\
+\hline
+Guam\\
+\hline
+Monaco\\
+\hline
+Puerto Rico\\
+\hline
+San Marino\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Belarus\\
+\hline
+Bhutan\\
+\hline
+Ethiopia\\
+\hline
+Guyana\\
+\hline
+Kazakhstan\\
+\hline
+Liberia\\
+\hline
+Mexico\\
+\hline
+Niger\\
+\hline
+Tajikistan\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Bermuda\\
+\hline
+Barbados\\
+\hline
+Cameroon\\
+\hline
+Samoa\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Cyprus\\
+\hline
+Italy\\
+\hline
+Japan\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+
+
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Ireland\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Burma\\
+\hline
+Myanmar\\
+\hline
+New Zealand\\
+\hline
+United States\\
+\hline
+Zambia\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+Liechtenstein\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{l}
+\hline
+x\\
+\hline
+New Caledonia\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{) \{}
+  \KeywordTok{print}\NormalTok{(names_h[names_k}\OperatorTok{$}\NormalTok{cluster10 }\OperatorTok{==}\StringTok{ }\NormalTok{i, ]}\OperatorTok{$}\NormalTok{Country)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Ireland"            "Korea, Republic of" "South Korea"       
+## [1] "Andorra"     "Guam"        "Monaco"      "Puerto Rico" "San Marino" 
+##  [1] "American Samoa"                  "Burkina Faso"                   
+##  [3] "Bolivia"                         "Bolivia, Plurinational State of"
+##  [5] "Comoros"                         "Cuba"                           
+##  [7] "Cayman Islands"                  "Dominica"                       
+##  [9] "Dominican Republic"              "Ghana"                          
+## [11] "Guinea-Bissau"                   "Lesotho"                        
+## [13] "Northern Mariana Islands"        "Namibia"                        
+## [15] "Rwanda"                          "Vanuatu"                        
+## [1] "Belarus"    "Bhutan"     "Ethiopia"   "Guyana"     "Kazakhstan"
+## [6] "Liberia"    "Malawi"     "Niger"      "Tajikistan"
+##  [1] "Burundi"       "Benin"         "India"         "Cambodia"     
+##  [5] "Burma"         "Myanmar"       "Mozambique"    "New Zealand"  
+##  [9] "Qatar"         "United States" "Zambia"       
+## [1] "Costa Rica"    "Liechtenstein" "Malta"         "New Caledonia"
+## [5] "Suriname"      "Slovakia"     
+## [1] "Bermuda"  "Barbados" "Cameroon" "Samoa"   
+##  [1] "Albania"                           "United Arab Emirates"             
+##  [3] "Antigua and Barbuda"               "Austria"                          
+##  [5] "Belgium"                           "Bangladesh"                       
+##  [7] "Bulgaria"                          "Bahrain"                          
+##  [9] "Bosnia and Herzegovina"            "Canada"                           
+## [11] "Switzerland"                       "Cape Verde"                       
+## [13] "Cyprus"                            "Germany"                          
+## [15] "Denmark"                           "Algeria"                          
+## [17] "Egypt"                             "France"                           
+## [19] "United Kingdom"                    "Gambia"                           
+## [21] "Equatorial Guinea"                 "Greece"                           
+## [23] "Grenada"                           "Guatemala"                        
+## [25] "Hong Kong"                         "Iraq"                             
+## [27] "Iceland"                           "Israel"                           
+## [29] "Italy"                             "Jamaica"                          
+## [31] "Jordan"                            "Japan"                            
+## [33] "Kuwait"                            "Luxembourg"                       
+## [35] "Latvia"                            "Morocco"                          
+## [37] "Madagascar"                        "Maldives"                         
+## [39] "Marshall Islands"                  "Mauritius"                        
+## [41] "Nigeria"                           "Netherlands"                      
+## [43] "Nepal"                             "Oman"                             
+## [45] "Pakistan"                          "Peru"                             
+## [47] "Philippines"                       "Portugal"                         
+## [49] "French Polynesia"                  "Romania"                          
+## [51] "Russia"                            "Russian Federation"               
+## [53] "Saudi Arabia"                      "Sudan"                            
+## [55] "Senegal"                           "Solomon Islands"                  
+## [57] "Slovenia"                          "Sweden"                           
+## [59] "Seychelles"                        "Tunisia"                          
+## [61] "Turkey"                            "Venezuela, Bolivarian Republic of"
+## [63] "Venezuela"                         "Vietnam"                          
+## [65] "Viet Nam"                          "South Africa"                     
+##  [1] "Aruba"                    "Argentina"               
+##  [3] "Australia"                "Bahamas"                 
+##  [5] "Brazil"                   "Brunei Darussalam"       
+##  [7] "Brunei"                   "Botswana"                
+##  [9] "Central African Republic" "Chile"                   
+## [11] "China"                    "Djibouti"                
+## [13] "Ecuador"                  "Eritrea"                 
+## [15] "Spain"                    "Finland"                 
+## [17] "Fiji"                     "Gabon"                   
+## [19] "Georgia"                  "Gibraltar"               
+## [21] "Greenland"                "Honduras"                
+## [23] "Haiti"                    "Indonesia"               
+## [25] "Kyrgyzstan"               "Saint Kitts and Nevis"   
+## [27] "Lebanon"                  "Saint Lucia"             
+## [29] "Sri Lanka"                "Mongolia"                
+## [31] "Malaysia"                 "Norway"                  
+## [33] "Palau"                    "Papua New Guinea"        
+## [35] "Paraguay"                 "Singapore"               
+## [37] "El Salvador"              "Sao Tome and Principe"   
+## [39] "Turks and Caicos Islands" "Chad"                    
+## [41] "Thailand"                 "Tonga"                   
+## [43] "Trinidad and Tobago"      "Uganda"                  
+## [45] "Ukraine"                  "Uzbekistan"              
+## [47] "Zimbabwe"                
+##  [1] "Afghanistan"            "Angola"                 "Armenia"               
+##  [4] "Azerbaijan"             "Belize"                 "Ivory Coast"           
+##  [7] "Côte d'Ivoire"          "Colombia"               "Estonia"               
+## [10] "Guinea"                 "Croatia"                "Hungary"               
+## [13] "Kenya"                  "Libya"                  "Libyan Arab Jamahiriya"
+## [16] "Lithuania"              "Mexico"                 "Mali"                  
+## [19] "Montenegro"             "Mauritania"             "Nicaragua"             
+## [22] "Panama"                 "Poland"                 "Sierra Leone"          
+## [25] "Somalia"                "Serbia"                 "South Sudan"           
+## [28] "Togo"                   "Turkmenistan"           "Uruguay"               
+## [31] "Yemen"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# trying to figure out how to format the above nicely into a table?}
 \CommentTok{#appendix (use xtable to format into Latex)}
 \CommentTok{# kableExtra}
 \NormalTok{tb <-}\StringTok{ }\KeywordTok{split}\NormalTok{(master_df_k, master_df_k}\OperatorTok{$}\NormalTok{cluster10)}
@@ -2245,7 +3522,8 @@ cluster & REFUGEE & COUNTRY\_EXCEP\\
 ## [13] SEA                  REFUGEE              COUNTRY_EXCEP       
 ## [16] WORK_EXCEP           cluster10            GDP                 
 ## [19] Pop                  Expectancy           Fertility           
-## [22] literacy            
+## [22] literacy             outlier_literacy     outlier_fertility   
+## [25] outlier_expectancy  
 ## <0 rows> (or 0-length row.names)
 \end{verbatim}
 
@@ -2283,7 +3561,8 @@ cluster & REFUGEE & COUNTRY\_EXCEP\\
 ## [13] SEA                  REFUGEE              COUNTRY_EXCEP       
 ## [16] WORK_EXCEP           cluster10            GDP                 
 ## [19] Pop                  Expectancy           Fertility           
-## [22] literacy            
+## [22] literacy             outlier_literacy     outlier_fertility   
+## [25] outlier_expectancy  
 ## <0 rows> (or 0-length row.names)
 \end{verbatim}
 
@@ -2318,7 +3597,8 @@ cluster & REFUGEE & COUNTRY\_EXCEP\\
 ## [13] SEA                  REFUGEE              COUNTRY_EXCEP       
 ## [16] WORK_EXCEP           cluster10            GDP                 
 ## [19] Pop                  Expectancy           Fertility           
-## [22] literacy            
+## [22] literacy             outlier_literacy     outlier_fertility   
+## [25] outlier_expectancy  
 ## <0 rows> (or 0-length row.names)
 \end{verbatim}
 
