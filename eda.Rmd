@@ -1002,3 +1002,19 @@ master_df_k[is.na(master_df_k$Fertility),]
 # TCA - 1.7
 ```
 
+
+```{r}
+library(ggfortify)
+policy.pca <- prcomp(master_df_h[,2:ncol(by_country)], center = TRUE,scale. = TRUE)
+# summary(policy.pca)
+g <- autoplot(policy.pca, data = master_df_h, colour = 'cluster10')
+g + ggtitle('HAC Clustering on First Two Principal Components') + labs(colour = 'cluster')
+```
+
+```{r}
+policy.pca <- prcomp(master_df_h[,2:ncol(by_country)], center = TRUE,scale. = TRUE)
+# summary(policy.pca)
+g <- autoplot(policy.pca, data = master_df_h, colour = 'cluster10')
+g + ggtitle('HAC Clustering on First Two Principal Components') + labs(colour = 'cluster')
+```
+
