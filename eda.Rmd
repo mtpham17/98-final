@@ -613,9 +613,11 @@ p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Expectancy), color = cluster
   geom_point(size=2)
 p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
+jpeg("k_twoway.jpeg")
 p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Fertility), color = cluster10)) +
   geom_point(size=2)
 p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
+dev.off()
 
 p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(literacy), color = cluster10)) +
   geom_point(size=2)
@@ -683,9 +685,11 @@ p2 <- ggplot(master_df_h, aes(x = log(Pop), y = log(Fertility), color = cluster1
   geom_point(size=2)
 p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
 
+jpeg('hac_twoway.jpeg')
 p2 <- ggplot(master_df_h, aes(x = log(Pop), y = log(literacy), color = cluster10)) +
   geom_point(size=2)
 p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
+dev.off()
 
 p2 <- ggplot(master_df_h, aes(x = log(Expectancy), y = log(Fertility), color = cluster10)) +
   geom_point(size=2)
@@ -753,7 +757,36 @@ for (i in 1:10) {
     (log(master_df_h[master_df_h$cluster10 == i, ]$GDP) < med - 1.5 * iqr)
 }
 
+# for NON-significant test result
 
+master_df_h$outlier_literacy <- rep(0, nrow(master_df_h))
+for (i in 1:10) {
+  med = median(master_df_h[master_df_h$cluster10 == i, ]$literacy)
+  iqr = IQR(master_df_h[master_df_h$cluster10 == i, ]$literacy)
+  master_df_h[master_df_h$cluster10 == i, ]$outlier_literacy <- 
+    (master_df_h[master_df_h$cluster10 == i, ]$literacy > med + 1.5 * iqr) |
+    (master_df_h[master_df_h$cluster10 == i, ]$literacy < med - 1.5 * iqr)
+}
+
+
+```
+
+
+```{r}
+# non-significant test result
+jpeg(file="boxplot_h_literacy.jpg")
+# do this manually
+ggplot(master_df_h, aes(x = cluster10, y = literacy, fill = cluster10)) +
+  geom_boxplot(alpha = 0.3) +
+  geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
+  geom_text_repel(aes(group = cluster10, 
+                label = ifelse(outlier_literacy, 
+                  yes = ISO3,
+                  no = '')), 
+            position = position_dodge(width=0.75),
+            hjust = "left", size = 3) + 
+  ggtitle("Country Literacy by HAC Cluster") + xlab("Policy Cluster") + theme(legend.position = "none")
+dev.off()
 ```
 
 
@@ -1018,6 +1051,7 @@ policy.pca <- prcomp(master_df_k[,2:ncol(by_country)], center = TRUE,scale. = TR
 # summary(policy.pca)
 jpeg(file="pca_k.jpg")
 g <- autoplot(policy.pca, data = master_df_k, colour = 'cluster10')
-g + ggtitle('HAC Clustering on First Two Principal Components') + labs(colour = 'cluster')
+g + ggtitle('K-Means Clustering on First Two Principal Components') + labs(colour = 'cluster')
+dev.off()
 ```
 
