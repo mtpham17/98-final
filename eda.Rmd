@@ -771,7 +771,7 @@ ggplot(master_df_k, aes(x = cluster10, y = literacy, fill = cluster10)) +
                   no = '')), 
             position = position_dodge(width=0.75),
             hjust = "left", size = 3) + 
-  ggtitle("HAC Literacy Boxplot") + xlab("Policy Cluster") + theme(legend.position = "none")
+  ggtitle("Country Literacy by K-Means Cluster") + xlab("Policy Cluster") + theme(legend.position = "none")
 dev.off()
 ```
 
@@ -785,7 +785,7 @@ ggplot(master_df_k, aes(x = cluster10, y = Fertility, fill = cluster10)) +
                   yes = ISO3,
                   no = '')), 
             position = position_dodge(width=0.75),
-            hjust = "left", size = 3) + ggtitle("HAC GDP Boxplot") + xlab("Policy Cluster") + 
+            hjust = "left", size = 3) + ggtitle("Country Fertility by K-Means Cluster") + xlab("Policy Cluster") + 
   theme(legend.position = "none")
 
 dev.off()
@@ -804,7 +804,7 @@ ggplot(master_df_h[!is.na(master_df_h$GDP), ], aes(x = cluster10, y = log(GDP), 
                   no = '')), 
             position = position_dodge(width=0.75),
             hjust = "left", size = 3) +
-  ggtitle("HAC GDP Boxplot") + xlab("Policy Cluster") + theme(legend.position = "none")
+  ggtitle("Country GDP by HAC Cluster") + xlab("Policy Cluster") + theme(legend.position = "none")
 dev.off()
 
 # ggrepel
@@ -822,7 +822,7 @@ ggplot(master_df_k,
                   yes = ISO3,
                   no = '')), 
             position = position_dodge(width=0.75),
-            hjust = "left", size = 3) + ggtitle("HAC GDP Boxplot") + 
+            hjust = "left", size = 3) + ggtitle("Country Life Expectancy by K-Means Cluster") + 
   xlab("Policy Cluster") + theme(legend.position = "none")
 dev.off()
 ```
@@ -838,7 +838,7 @@ ggplot(master_df_h,
                   yes = ISO3,
                   no = '')), 
             position = position_dodge(width=0.75),
-            hjust = "left", size = 3) + ggtitle("HAC GDP Boxplot") + xlab("Policy Cluster") + 
+            hjust = "left", size = 3) + ggtitle("Country Life Expectancy by HAC Cluster") + xlab("Policy Cluster") + 
   theme(legend.position = "none")
 dev.off()
 ```
@@ -1007,14 +1007,17 @@ master_df_k[is.na(master_df_k$Fertility),]
 library(ggfortify)
 policy.pca <- prcomp(master_df_h[,2:ncol(by_country)], center = TRUE,scale. = TRUE)
 # summary(policy.pca)
+jpeg(file="pca_hac.jpg")
 g <- autoplot(policy.pca, data = master_df_h, colour = 'cluster10')
 g + ggtitle('HAC Clustering on First Two Principal Components') + labs(colour = 'cluster')
+dev.off()
 ```
 
 ```{r}
-policy.pca <- prcomp(master_df_h[,2:ncol(by_country)], center = TRUE,scale. = TRUE)
+policy.pca <- prcomp(master_df_k[,2:ncol(by_country)], center = TRUE,scale. = TRUE)
 # summary(policy.pca)
-g <- autoplot(policy.pca, data = master_df_h, colour = 'cluster10')
+jpeg(file="pca_k.jpg")
+g <- autoplot(policy.pca, data = master_df_k, colour = 'cluster10')
 g + ggtitle('HAC Clustering on First Two Principal Components') + labs(colour = 'cluster')
 ```
 
