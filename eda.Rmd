@@ -23,6 +23,7 @@ library(countrycode)
 library(tidyverse)
 library(ggrepel)
 library(kableExtra)
+library(cluster)
 ```
 
 ```{r}
@@ -207,12 +208,20 @@ flattenCorrMatrix(data_cor$r, data_cor$P)
 set.seed(98)
 # load the library
 # calculate correlation matrix
-correlationMatrix <- cor(cleaned_df[, 3:ncol(cleaned_df)])
+ccor <- round(cor(cleaned_df[, 3:ncol(cleaned_df)]), 2)
 # summarize the correlation matrix
 # find attributes that are highly corrected (ideally >0.75)
-highlyCorrelated <- findCorrelation(correlationMatrix, cutoff=0.60)
-# print indexes of highly correlated attributes
-print(highlyCorrelated)
+upper <- ccor
+upper[upper.tri(ccor)]<-""
+upper<-as.data.frame(upper)
+
+lower <- ccor
+lower[lower.tri(ccor, diag=TRUE)]<-""
+lower<-as.data.frame(lower)
+
+library(xtable)
+
+print(xtable(upper), type="latex")
 ```
 
 
@@ -902,7 +911,7 @@ for (i in 1:10) {
 
 ```{r}
 for (i in 1:10) {
-  print(names_h[names_k$cluster10 == i, ]$Country)
+  print(names_k[names_k$cluster10 == i, ]$Country)
 }
 ```
 
