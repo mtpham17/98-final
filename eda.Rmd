@@ -5,6 +5,7 @@ output: rmarkdown::latex_document
 
 
 ```{r}
+# load all necessary libraries
 library(mltools)
 library(data.table)
 library(dplyr)
@@ -24,17 +25,18 @@ library(tidyverse)
 library(ggrepel)
 library(kableExtra)
 library(cluster)
+library(xtable)
 ```
 
 ```{r}
+# read in data, and summarize
 data <- read.csv('data/immigration_policies/policy_list.csv')
-# summary(data)
+summary(data)
 
 ```
 
 ```{r}
-colSums(is.na(data))[colSums(is.na(data)) != 0]
-
+# making a copy of our data frame
 mod_df <- data.frame(data)
 
 # dropping columns that will not affect our data analysis in any way
@@ -44,12 +46,10 @@ colSums(is.na(mod_df))[colSums(is.na(mod_df)) == 0]
 ```
 
 ```{r}
-# tables to summarize data
-# find twelve variables that most interested in, and do correlatin matrix
-# if certain variables are very highly correlated, then only use one of the two
+# finding NA values
+colSums(is.na(data))[colSums(is.na(data)) != 0]
 
-# geom jitter -- points won't be laying on top of each other
-
+# prints all columns with no NA values
 for (i in 1:length(colnames(mod_df))) {
   column = colnames(mod_df)[i]
   if (sum(is.na(mod_df[, column])) == 0) {
@@ -63,11 +63,8 @@ for (i in 1:length(colnames(mod_df))) {
 ```
 
 
-we know that there are 1762 observations total. we substitute out visa_ban (0 or 1 values)
-with visa_ban_type, which encapsulates all, specific, or none -- we will need to one-hot encode this! other ones to explore: history_ban_list and citizen_list. If I use these, then eliminate history_ban and citizen from consideration (these are values that don't have N/As)
-
 ```{r}
-# data cleaning for NA values
+# data cleaning for NA values, mostly one-hot encoding
 
 ## VISA_BAN_LIST
 
@@ -118,13 +115,6 @@ mod_df$HISTORY_BAN_CLEANED <- unlist(lapply(mod_df$HISTORY_BAN_LIST, country_cou
 mod_df$CITIZEN_LIST_CLEANED <- unlist(lapply(mod_df$CITIZEN_LIST, country_counter))
 ```
 
-for clustering, will use 
-- policy_type, (maybe policy_subtype?) -- need to one-hot-encode
-- length of policy (end_date - start_date)
-- air, land, sea, refugee, country_excep, work_excep
-- visa_ban, citizen_list, and history_ban are already covered by the ``list" values we are including
-
-
 
 ```{r}
 # data cleaning for non-NA values
@@ -133,6 +123,7 @@ colSums(is.na(mod_df))[colSums(is.na(mod_df)) == 0]
 ## DATES
 mod_df$START_DATE_CLEANED <- as.Date(mod_df$START_DATE, tryFormats = "%m_%d_%y")
 mod_df$END_DATE_CLEANED <- as.Date(mod_df$END_DATE, tryFormats = "%m_%d_%y")
+
 # making assumption that "NA" end date means the policy is still in place
 # na values --> setting them equal to today's date
 mod_df[is.na(mod_df$END_DATE_CLEANED), ]$END_DATE_CLEANED <- Sys.Date()
@@ -149,37 +140,15 @@ mod_df$POLICY_LENGTH <- as.numeric(mod_df$POLICY_LENGTH)
 
 
 ```{r}
-## one-hot encoding the policy type
+# standardize all data:
+standardize <- function(col) {
+  return((col - mean(col)) / sd(col))
+}
 
-# 0 --> not implemented, 1 --> partially implemented, 2 --> complete
-mod_df$POLICY_TYPE_CLEANED <- rep(0, nrow(mod_df))
-mod_df[mod_df$POLICY_TYPE == "PARTIAL", ]$POLICY_TYPE_CLEANED <- 1
-mod_df[mod_df$POLICY_TYPE == "COMPLETE", ]$POLICY_TYPE_CLEANED <- 2
-
-```
-
-
-AT THIS POINT, WE ARE DONE WITH CLEANING. THESE ARE THE VARIABLE NAMES WE WANT TO USE:
-
-
-ones we've cleaned:
-
-VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL, HISTORY_BAN_CLEANED, CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_CLEANED
-
-ones we've left alone:
-
-AIR, LAND, SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP
-
-```{r}
-# post data cleaning -- need to aggregate by country
 vars <- c("COUNTRY_NAME", "ISO3", "VISA_BAN_NONE", "VISA_BAN_SPECIFIC", "VISA_BAN_ALL",
           "HISTORY_BAN_CLEANED", "CITIZEN_LIST_CLEANED", "POLICY_LENGTH",
           "POLICY_TYPE_COMPLETE", "POLICY_TYPE_PARTIAL", "AIR", "LAND", "SEA", 
           "POLICY_TYPE_NON", "REFUGEE", "COUNTRY_EXCEP", "WORK_EXCEP")
-
-standardize <- function(col) {
-  return((col - mean(col)) / sd(col))
-}
 
 cleaned_df <- subset(mod_df, select=vars)
 ind <- sapply(cleaned_df, is.numeric)
@@ -189,6 +158,8 @@ cleaned_df[ind] <- lapply(cleaned_df[ind], standardize)
 
 
 ```{r}
+# report correlation matrix to see if any chosen variables are redundant:
+
 flattenCorrMatrix <- function(cormat, pmat) {
   ut <- upper.tri(cormat)
   data.frame(
@@ -219,15 +190,13 @@ lower <- ccor
 lower[lower.tri(ccor, diag=TRUE)]<-""
 lower<-as.data.frame(lower)
 
-library(xtable)
-
 print(xtable(upper), type="latex")
 ```
 
 
 
 ```{r}
-# hopefully ISO3 can be easily matched with other data sets
+
 by_country <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
                               HISTORY_BAN_CLEANED,
                               CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_NON, 
@@ -238,11 +207,6 @@ by_country <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
 ```
 
 
-NOW, we can work with the by_country data frame!!!
-
-
-
-
 ```{r}
 summary(cleaned_df)
 new_vars <- c("VISA_BAN_NONE", "VISA_BAN_SPECIFIC", "VISA_BAN_ALL",
@@ -251,74 +215,40 @@ new_vars <- c("VISA_BAN_NONE", "VISA_BAN_SPECIFIC", "VISA_BAN_ALL",
           "POLICY_TYPE_NON", "REFUGEE", "COUNTRY_EXCEP", "WORK_EXCEP")
 ```
 
-goals by next Wednesday:
-- kMeans cluster on selected variables
-- hierarchical cluster 
-- (not needed by next Wednesday, but we can vary the number of clusters and where you stop on the dendrogram) -- can talk about this as next steps
-- plot two variables from demographics -- then plot the clusters we previously generated (for immigration policies) -- this can be a wednesday goal!
-- can also run the cluster algorithm on the demographics data -- does not need to be a wednesday goal
-- WorldBank, Gap Minder (may have an R package!) -- other potential data sets for the demographic
-- try different distance metrics to see how much the answer changes (how robust is it to that choice?)
-- k-modes clustering -- better suited for categorical data
-
-
-- see how clusters change with inclusion of different variables
-
-
-
-FEEDBACK FROM PRESENTATION:
-
-- log of GDP, population to adjust the scale
-- formal tests: 2-sample means on a metric between clusters
-- PCA on demographic factors for ease of visualization
-- formal test to determine how many clusters there are
-- some way to score the different policies, and then see if there is a correlation between that and certain demographic covariates
-- find some indicator of "natural" clustering -- do we see patterns among certain continents, developed vs developing, etc -- then adjust number of clusters based on the number of natural clusters, and see whether the contents of those clusters are the same
-- try running PCA on immigration policies (???)
-
-FOR MEETING WITH KELLY:
-- have decided not to cluster countries based on their demographic factors, and to instead use that as a more informal way to investigate the clusters based on immigration policies
-
-To do before meeting:
-- download data on GDP, population, life expectancy, education rate, and fertility rate DONE
-- officially decide on the number of clusters and linkage for HAC and K-means DONE
-- the results section will consist of some visuals (probably PCA to get two dimensions -- but is this interpretable?), ANOVA test on those same factors (GDP, population, life expectancy, education rate, fertility rate) across different clusters (for both methods)
-- look at the natural way of clustering (by continent, development level)
 
 DETERMINING THE NUMBER OF CLUSTERS:
 
 ```{r}
-# explain how number of clusters is very much impacted by choice of heuristics
+set.seed(98)
+gap_stat <- clusGap(by_country[,2:ncol(by_country)], kmeans, K.max = 10, B = 50)
 jpeg(file="gap_k.jpg")
-fviz_nbclust(by_country[,2:ncol(by_country)], kmeans, nstart = 25,  method = "gap_stat", 
-             nboot =50)+ labs(subtitle = "Gap statistic method for K Means")
+fviz_gap_stat(
+  gap_stat,
+  linecolor = "steelblue",
+  maxSE = list(method = "Tibs2001SEmax", SE.factor = 1)
+)
 dev.off()
 
-fviz_nbclust(by_country[,2:ncol(by_country)], kmeans, nstart = 25,  method = "silhouette", 
-             nboot =50)+ labs(subtitle = "Silhouette method for K Means")
-fviz_nbclust(by_country[,2:ncol(by_country)], kmeans, nstart = 25,  method = "wss", 
-             nboot =50)+ labs(subtitle = "Elbow method for K Means")
-
-jpeg(file="gap_hac.jpg")
-fviz_nbclust(by_country[,2:ncol(by_country)], hcut, nstart = 25,  method = "gap_stat", 
-             nboot = 50)+labs(subtitle = "Gap statistic method for HAC")
+jpeg(file="gap_h.jpg")
+gap_stat <- clusGap(by_country[,2:ncol(by_country)], hcut, K.max = 10)
+fviz_gap_stat(
+  gap_stat,
+  linecolor = "steelblue",
+  maxSE = list(method = "Tibs2001SEmax", SE.factor = 1)
+)
 dev.off()
-fviz_nbclust(by_country[,2:ncol(by_country)], hcut, nstart = 25,  method = "silhouette", 
-             nboot = 50)+labs(subtitle = "Silhouette method for HAC")
-fviz_nbclust(by_country[,2:ncol(by_country)], hcut, nstart = 25,  method = "wss", 
-             nboot = 50)+labs(subtitle = "Elbow method for HAC")
-
-# what to do if the two don't agree?
 ```
 
 
-DETERMINING THE LINKAGE CRITERIA:
+
 
 ```{r}
-# Data
+# DETERMINING THE LINKAGE CRITERIA
+
 dist_mat <- dist(by_country[,2:ncol(by_country)], method = 'euclidean')
 
-# Hierarchical Agglomerative Clustering
+# testing different linkage methods
+
 h1=hclust(dist_mat,method='average')
 h2=hclust(dist_mat,method='complete')
 h3=hclust(dist_mat,method='centroid')
@@ -351,40 +281,15 @@ cor(dist_mat,c8)
 # average is the best linkage method
 ```
 
-for now, use 3 clusters (for HAC and k-means)
-
 ```{r}
 # kmeans clustering
 set.seed(98)
-cluster.results.10 <- kmeans(by_country[,2:ncol(by_country)], 10, 
-                          iter.max = 10, nstart = 1)
 
-# cluster.results.6 <- kmeans(by_country[,2:ncol(by_country)], 6, 
-#                           iter.max = 10, nstart = 1)
+cluster.results.6 <- kmeans(by_country[,2:ncol(by_country)], 6,nstart = 10)
 
 kcluster_by_country = data.frame(by_country)
-kcluster_by_country$cluster10 <- as.factor(cluster.results.10$cluster)
-# kcluster_by_country$cluster10 <- as.factor(cluster.results.6$cluster)
-```
-
-
-```{r}
-# testing if log transformations fix the chaining issue
-
-# by_country_test <- data.frame(by_country)
-# ind <- sapply(by_country_test, is.numeric)
-# by_country_test[ind] <- lapply(by_country_test[ind], function(x) log(x + 5))
-# 
-# dist_mat_test <- dist(by_country_test[,2:ncol(by_country_test)], method = 'euclidean')
-# hclust_avg_test <- hclust(dist_mat_test, method = 'average')
-# hclust_cen_test <- hclust(dist_mat_test, method = 'centroid')
-# 
-# test_cut_avg <- cutree(hclust_avg_test, k = 10)
-# test_cut_cen <- cutree(hclust_cen_test, k = 10)
-# 
-# hcluster_test_avg <- mutate(by_country, cluster = test_cut_avg)
-# hcluster_test_cen <- mutate(by_country, cluster = test_cut_cen)
-
+kcluster_by_country$cluster <- as.factor(cluster.results.6$cluster)
+# kcluster_by_country$cluster <- as.factor(cluster.results.6$cluster)
 ```
 
 
@@ -398,27 +303,15 @@ jpeg(file="cluster_den.jpg")
 plot(hclust_avg)
 dev.off()
 
-cut_avg10 <- cutree(hclust_avg, k = 10)
+cut_avg6 <- cutree(hclust_avg, k = 6)
 
-avg_dend_obj <- as.dendrogram(hclust_avg, h = 10, leaflab = "none")
-labels(avg_dend_obj) <- rep(NA, nrow(by_country))
-avg_col_dend10 <- color_branches(avg_dend_obj, k = 10)
-
-jpeg(file="cluster_den10.jpg")
-plot(avg_col_dend10)
-dev.off()
-
-# jpeg(file="cluster_den6.jpg")
-# plot(avg_col_dend6)
-# dev.off()
-
-hcluster_by_country10 <- mutate(by_country, cluster = cut_avg10)
+hcluster_by_country6 <- mutate(by_country, cluster = cut_avg6)
 # hcluster_by_country6 <- mutate(by_country, cluster = cut_avg6)
 
 hcluster_by_country <- data.frame(by_country)
 
-hcluster_by_country$cluster10 <- as.factor(hcluster_by_country10$cluster)
-# hcluster_by_country$cluster10 <- as.factor(hcluster_by_country6$cluster)
+hcluster_by_country$cluster <- as.factor(hcluster_by_country6$cluster)
+# hcluster_by_country$cluster <- as.factor(hcluster_by_country6$cluster)
 ```
 
 ```{r}
@@ -433,6 +326,8 @@ iso3 <- read.csv('data/demographic/iso3.csv')
 
 
 ```{r}
+# the world bank had some missing values, which were filled in by hand (since one data source did not have all of the missing values)
+
 gdp[gdp$Code == "ABW", ]$GDP = 3202 * 10^6
 gdp[gdp$Code == "AND", ]$GDP = 3155 * 10^6
 gdp[gdp$Code == "ERI", ]$GDP = 2.07 * 10^9
@@ -448,9 +343,6 @@ gdp[gdp$Code == "TKM", ]$GDP = 45231 * 10^6
 gdp[gdp$Code == "VEN", ]$GDP = 47.26 * 10^9
 gdp[gdp$Code == "YEM", ]$GDP = 23486 * 10^6
 
-```
-
-```{r}
 life_expectancy[life_expectancy$Code == "AND", ]$Expectancy = 84.5
 life_expectancy[life_expectancy$Code == "ASM", ]$Expectancy = 73.32
 life_expectancy[life_expectancy$Code == "CYM", ]$Expectancy = 82.19
@@ -463,9 +355,7 @@ life_expectancy[life_expectancy$Code == "MNP", ]$Expectancy = 77.1
 life_expectancy[life_expectancy$Code == "PLW", ]$Expectancy = 69.13
 life_expectancy[life_expectancy$Code == "SMR", ]$Expectancy = 85.42
 life_expectancy[life_expectancy$Code == "TCA", ]$Expectancy = 80.6
-```
 
-```{r}
 fertility_rate[fertility_rate$Code == "AND", ]$Fertility = 1.3
 fertility_rate[fertility_rate$Code == "ASM", ]$Fertility = 2.28
 fertility_rate[fertility_rate$Code == "CYM", ]$Fertility = 1.83
@@ -480,6 +370,7 @@ fertility_rate[fertility_rate$Code == "SMR", ]$Fertility = 1.3
 fertility_rate[fertility_rate$Code == "TCA", ]$Fertility = 1.7
 ```
 
+
 ```{r}
 # some data cleaning on literacy rate -- need to note how not all of them were pulled from
 # 2020
@@ -491,7 +382,7 @@ literacy_rate$Code <- trimws(literacy_rate$Code)
 
 
 ```{r}
-
+# merging all demographic factors
 master_df_k <- merge(kcluster_by_country, gdp, by.x = "ISO3", by.y = "Code")
 master_df_k <- merge(master_df_k, population, by.x = "ISO3", by.y = "Code")
 master_df_k <- merge(master_df_k, life_expectancy, by.x = "ISO3", by.y = "Code")
@@ -515,11 +406,11 @@ master_df_h <- subset(master_df_h, select = -c(Name.x, X.x, Name.y, X.y))
 # histograms or boxplots -- distribution of these variables across these clusters change
 # for ones that are significant -- look for outliers!
 
-k_gdp <- aov(GDP ~ cluster10, data = master_df_k)
-k_pop <- aov(Pop ~ cluster10, data = master_df_k) 
-k_exp <- aov(Expectancy ~ cluster10, data = master_df_k) 
-k_fert <- aov(Fertility ~ cluster10, data = master_df_k) 
-k_lit <- aov(literacy ~ cluster10, data = master_df_k) 
+k_gdp <- aov(GDP ~ cluster, data = master_df_k)
+k_pop <- aov(Pop ~ cluster, data = master_df_k) 
+k_exp <- aov(Expectancy ~ cluster, data = master_df_k) 
+k_fert <- aov(Fertility ~ cluster, data = master_df_k) 
+k_lit <- aov(literacy ~ cluster, data = master_df_k) 
 
 summary(k_gdp)
 summary(k_pop)
@@ -529,11 +420,11 @@ summary(k_lit)
 ```
 
 ```{r}
-h_gdp <- aov(GDP ~ cluster10, data = master_df_h)
-h_pop <- aov(Pop ~ cluster10, data = master_df_h) 
-h_exp <- aov(Expectancy ~ cluster10, data = master_df_h) 
-h_fert <- aov(Fertility ~ cluster10, data = master_df_h) 
-h_lit <- aov(literacy ~ cluster10, data = master_df_h) 
+h_gdp <- aov(GDP ~ cluster, data = master_df_h)
+h_pop <- aov(Pop ~ cluster, data = master_df_h) 
+h_exp <- aov(Expectancy ~ cluster, data = master_df_h) 
+h_fert <- aov(Fertility ~ cluster, data = master_df_h) 
+h_lit <- aov(literacy ~ cluster, data = master_df_h) 
 
 summary(h_gdp)
 summary(h_pop)
@@ -582,18 +473,16 @@ master_df_h_hdi <- merge(master_df_h, hdi, by.x = "ISO3", by.y = "Code")
 
 
 ```{r}
-rand.index(as.numeric(levels(master_df_k_continent$cluster10))[master_df_k_continent$cluster10],
+rand.index(as.numeric(levels(master_df_k_continent$cluster))[master_df_k_continent$cluster],
            master_df_k_continent$continent)
-rand.index(as.numeric(levels(master_df_h_continent$cluster10))[master_df_h_continent$cluster10],
+rand.index(as.numeric(levels(master_df_h_continent$cluster))[master_df_h_continent$cluster],
            master_df_k_continent$continent)
-rand.index(as.numeric(levels(master_df_h_continent$cluster10))[master_df_h_continent$cluster10],
-           as.numeric(levels(master_df_k_continent$cluster10))[master_df_k_continent$cluster10])
-rand.index(as.numeric(levels(master_df_k_hdi$cluster10))[master_df_k_hdi$cluster10], 
+rand.index(as.numeric(levels(master_df_h_continent$cluster))[master_df_h_continent$cluster],
+           as.numeric(levels(master_df_k_continent$cluster))[master_df_k_continent$cluster])
+rand.index(as.numeric(levels(master_df_k_hdi$cluster))[master_df_k_hdi$cluster], 
            master_df_k_hdi$development)
-rand.index(as.numeric(levels(master_df_h_hdi$cluster10))[master_df_h_hdi$cluster10], 
+rand.index(as.numeric(levels(master_df_h_hdi$cluster))[master_df_h_hdi$cluster], 
            master_df_h_hdi$development)
-# trying to explain these results? need similar data for developed vs undeveloped
-# be prepared to justify why!!
 ```
 
 ```{r}
@@ -614,132 +503,120 @@ rand.index(as.numeric(levels(master_df_h_hdi$cluster10))[master_df_h_hdi$cluster
 vars <- c("GDP", "Pop", "Expectancy", "Fertility", "literacy")
 pairs <- t(combn(vars, 2))
 
-p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Pop), color = cluster10)) +
+p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Pop), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Expectancy), color = cluster10)) +
+p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Expectancy), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
 jpeg("k_twoway.jpeg")
-p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Fertility), color = cluster10)) +
+p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Fertility), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
 dev.off()
 
-p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(literacy), color = cluster10)) +
+p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(literacy), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Expectancy), color = cluster10)) +
+p2 <- ggplot(master_df_k, aes(x = log(GDP), y = log(Expectancy), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(Expectancy), color = cluster10)) +
+p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(Expectancy), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(Fertility), color = cluster10)) +
+p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(Fertility), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(literacy), color = cluster10)) +
+p2 <- ggplot(master_df_k, aes(x = log(Pop), y = log(literacy), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(Expectancy), y = log(Fertility), color = cluster10)) +
+p2 <- ggplot(master_df_k, aes(x = log(Expectancy), y = log(Fertility), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_k, aes(x = log(Fertility), y = log(literacy), color = cluster10)) +
+p2 <- ggplot(master_df_k, aes(x = log(Fertility), y = log(literacy), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("K-Means: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
 #jpeg(file="kmeans_6.jpg")
 #dev.off()
 
 #jpeg(file="hac_6.jpg")
-# p3 <- ggplot(master_df_h, aes(x = log(Pop), y = log(Expectancy), color = cluster10)) + geom_point(size=2) 
+# p3 <- ggplot(master_df_h, aes(x = log(Pop), y = log(Expectancy), color = cluster)) + geom_point(size=2) 
 # p3 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 #dev.off()
 ```
 
 ```{r}
-p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Pop), color = cluster10)) +
+p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Pop), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Expectancy), color = cluster10)) +
+p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Expectancy), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Fertility), color = cluster10)) +
+p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Fertility), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(literacy), color = cluster10)) +
+p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(literacy), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Expectancy), color = cluster10)) +
+p2 <- ggplot(master_df_h, aes(x = log(GDP), y = log(Expectancy), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(Pop), y = log(Expectancy), color = cluster10)) +
+p2 <- ggplot(master_df_h, aes(x = log(Pop), y = log(Expectancy), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(Pop), y = log(Fertility), color = cluster10)) +
+p2 <- ggplot(master_df_h, aes(x = log(Pop), y = log(Fertility), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
 jpeg('hac_twoway.jpeg')
-p2 <- ggplot(master_df_h, aes(x = log(Pop), y = log(literacy), color = cluster10)) +
+p2 <- ggplot(master_df_h, aes(x = log(Pop), y = log(literacy), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 dev.off()
 
-p2 <- ggplot(master_df_h, aes(x = log(Expectancy), y = log(Fertility), color = cluster10)) +
+p2 <- ggplot(master_df_h, aes(x = log(Expectancy), y = log(Fertility), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 
-p2 <- ggplot(master_df_h, aes(x = log(Fertility), y = log(literacy), color = cluster10)) +
+p2 <- ggplot(master_df_h, aes(x = log(Fertility), y = log(literacy), color = cluster)) +
   geom_point(size=2)
-p2 + ggtitle("HAC: 10 Clusters") + scale_fill_brewer(palette="Set3")
+p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 ```
 
 ```{r}
-# manually label outliers -- df_k literacy
-master_df_k$outlier_literacy <- rep(0, nrow(master_df_k))
-for (i in 1:10) {
-  med = median(master_df_k[master_df_k$cluster10 == i, ]$literacy)
-  iqr = IQR(master_df_k[master_df_k$cluster10 == i, ]$literacy)
-  master_df_k[master_df_k$cluster10 == i, ]$outlier_literacy <- 
-    (master_df_k[master_df_k$cluster10 == i, ]$literacy > med + 1.5 * iqr) |
-    (master_df_k[master_df_k$cluster10 == i, ]$literacy < med - 1.5 * iqr)
-}
-
-# df_k fertility
-
-master_df_k$outlier_fertility <- rep(0, nrow(master_df_k))
-for (i in 1:10) {
-  med = median(master_df_k[master_df_k$cluster10 == i, ]$Fertility)
-  iqr = IQR(master_df_k[master_df_k$cluster10 == i, ]$Fertility)
-  master_df_k[master_df_k$cluster10 == i, ]$outlier_fertility <- 
-    (master_df_k[master_df_k$cluster10 == i, ]$Fertility > med + 1.5 * iqr) |
-    (master_df_k[master_df_k$cluster10 == i, ]$Fertility < med - 1.5 * iqr)
-}
-
-# df_k expectancy
+# manually label outliers for boxplots
 
 master_df_k$outlier_expectancy <- rep(0, nrow(master_df_k))
 for (i in 1:10) {
-  med = median(master_df_k[master_df_k$cluster10 == i, ]$Expectancy)
-  iqr = IQR(master_df_k[master_df_k$cluster10 == i, ]$Expectancy)
-  master_df_k[master_df_k$cluster10 == i, ]$outlier_expectancy <- 
-    (master_df_k[master_df_k$cluster10 == i, ]$Expectancy> med + 1.5 * iqr) |
-    (master_df_k[master_df_k$cluster10 == i, ]$Expectancy < med - 1.5 * iqr)
+  med = median(master_df_k[master_df_k$cluster == i, ]$Expectancy)
+  iqr = IQR(master_df_k[master_df_k$cluster == i, ]$Expectancy)
+  master_df_k[master_df_k$cluster == i, ]$outlier_expectancy <- 
+    (master_df_k[master_df_k$cluster == i, ]$Expectancy> med + 1.5 * iqr) |
+    (master_df_k[master_df_k$cluster == i, ]$Expectancy < med - 1.5 * iqr)
+}
+
+master_df_k$outlier_gdp <- rep(0, nrow(master_df_k))
+for (i in 1:10) {
+  med = median(log(master_df_k[master_df_k$cluster == i, ]$GDP))
+  iqr = IQR(log(master_df_k[master_df_k$cluster == i, ]$GDP))
+  master_df_k[master_df_k$cluster == i, ]$outlier_gdp <- 
+    (log(master_df_k[master_df_k$cluster == i, ]$GDP) > med + 1.5 * iqr) |
+    (log(master_df_k[master_df_k$cluster == i, ]$GDP) < med - 1.5 * iqr)
 }
 
 ```
@@ -750,31 +627,31 @@ for (i in 1:10) {
 
 master_df_h$outlier_expectancy <- rep(0, nrow(master_df_h))
 for (i in 1:10) {
-  med = median(master_df_k[master_df_h$cluster10 == i, ]$Expectancy)
-  iqr = IQR(master_df_k[master_df_h$cluster10 == i, ]$Expectancy)
-  master_df_h[master_df_h$cluster10 == i, ]$outlier_expectancy <- 
-    (master_df_h[master_df_h$cluster10 == i, ]$Expectancy> med + 1.5 * iqr) |
-    (master_df_h[master_df_h$cluster10 == i, ]$Expectancy < med - 1.5 * iqr)
+  med = median(master_df_k[master_df_h$cluster == i, ]$Expectancy)
+  iqr = IQR(master_df_k[master_df_h$cluster == i, ]$Expectancy)
+  master_df_h[master_df_h$cluster == i, ]$outlier_expectancy <- 
+    (master_df_h[master_df_h$cluster == i, ]$Expectancy> med + 1.5 * iqr) |
+    (master_df_h[master_df_h$cluster == i, ]$Expectancy < med - 1.5 * iqr)
 }
 
 master_df_h$outlier_gdp <- rep(0, nrow(master_df_h))
 for (i in 1:10) {
-  med = median(log(master_df_k[master_df_h$cluster10 == i, ]$GDP))
-  iqr = IQR(log(master_df_k[master_df_h$cluster10 == i, ]$GDP))
-  master_df_h[master_df_h$cluster10 == i, ]$outlier_gdp <- 
-    (log(master_df_h[master_df_h$cluster10 == i, ]$GDP) > med + 1.5 * iqr) |
-    (log(master_df_h[master_df_h$cluster10 == i, ]$GDP) < med - 1.5 * iqr)
+  med = median(log(master_df_h[master_df_h$cluster == i, ]$GDP))
+  iqr = IQR(log(master_df_h[master_df_h$cluster == i, ]$GDP))
+  master_df_h[master_df_h$cluster == i, ]$outlier_gdp <- 
+    (log(master_df_h[master_df_h$cluster == i, ]$GDP) > med + 1.5 * iqr) |
+    (log(master_df_h[master_df_h$cluster == i, ]$GDP) < med - 1.5 * iqr)
 }
 
 # for NON-significant test result
 
 master_df_h$outlier_literacy <- rep(0, nrow(master_df_h))
 for (i in 1:10) {
-  med = median(master_df_h[master_df_h$cluster10 == i, ]$literacy)
-  iqr = IQR(master_df_h[master_df_h$cluster10 == i, ]$literacy)
-  master_df_h[master_df_h$cluster10 == i, ]$outlier_literacy <- 
-    (master_df_h[master_df_h$cluster10 == i, ]$literacy > med + 1.5 * iqr) |
-    (master_df_h[master_df_h$cluster10 == i, ]$literacy < med - 1.5 * iqr)
+  med = median(master_df_h[master_df_h$cluster == i, ]$literacy)
+  iqr = IQR(master_df_h[master_df_h$cluster == i, ]$literacy)
+  master_df_h[master_df_h$cluster == i, ]$outlier_literacy <- 
+    (master_df_h[master_df_h$cluster == i, ]$literacy > med + 1.5 * iqr) |
+    (master_df_h[master_df_h$cluster == i, ]$literacy < med - 1.5 * iqr)
 }
 
 
@@ -785,10 +662,10 @@ for (i in 1:10) {
 # non-significant test result
 jpeg(file="boxplot_h_literacy.jpg")
 # do this manually
-ggplot(master_df_h, aes(x = cluster10, y = literacy, fill = cluster10)) +
+ggplot(master_df_h, aes(x = cluster, y = literacy, fill = cluster)) +
   geom_boxplot(alpha = 0.3) +
-  geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
-  geom_text_repel(aes(group = cluster10, 
+  geom_point(aes(color = cluster, group = cluster), position = position_dodge(width=0.75)) +
+  geom_text_repel(aes(group = cluster, 
                 label = ifelse(outlier_literacy, 
                   yes = ISO3,
                   no = '')), 
@@ -800,47 +677,12 @@ dev.off()
 
 
 ```{r}
-# not sure how meaningful something like this would be? definitely needs some cleaning up
-# source of code: https://stackoverflow.com/questions/47842646/labelling-outliers-with-ggplot
-jpeg(file="boxplot_k_literacy.jpg")
-# do this manually
-ggplot(master_df_k, aes(x = cluster10, y = literacy, fill = cluster10)) +
-  geom_boxplot(alpha = 0.3) +
-  geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
-  geom_text_repel(aes(group = cluster10, 
-                label = ifelse(outlier_literacy, 
-                  yes = ISO3,
-                  no = '')), 
-            position = position_dodge(width=0.75),
-            hjust = "left", size = 3) + 
-  ggtitle("Country Literacy by K-Means Cluster") + xlab("Policy Cluster") + theme(legend.position = "none")
-dev.off()
-```
-
-```{r}
-jpeg(file="boxplot_k_fertility.jpg")
-ggplot(master_df_k, aes(x = cluster10, y = Fertility, fill = cluster10)) +
-  geom_boxplot(alpha = 0.3) +
-  geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
-  geom_text_repel(aes(group = cluster10, 
-                label = ifelse(outlier_fertility,
-                  yes = ISO3,
-                  no = '')), 
-            position = position_dodge(width=0.75),
-            hjust = "left", size = 3) + ggtitle("Country Fertility by K-Means Cluster") + xlab("Policy Cluster") + 
-  theme(legend.position = "none")
-
-dev.off()
-```
-
-
-```{r}
 jpeg(file="boxplot_h_gdp.jpg")
-ggplot(master_df_h[!is.na(master_df_h$GDP), ], aes(x = cluster10, y = log(GDP), fill = 
-                                                     cluster10)) +
+ggplot(master_df_h[!is.na(master_df_h$GDP), ], aes(x = cluster, y = log(GDP), fill = 
+                                                     cluster)) +
   geom_boxplot(alpha = 0.3) +
-  geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
-  geom_text_repel(aes(group = cluster10, 
+  geom_point(aes(color = cluster, group = cluster), position = position_dodge(width=0.75)) +
+  geom_text_repel(aes(group = cluster, 
                 label = ifelse(outlier_gdp, 
                   yes = ISO3,
                   no = '')), 
@@ -848,18 +690,32 @@ ggplot(master_df_h[!is.na(master_df_h$GDP), ], aes(x = cluster10, y = log(GDP), 
             hjust = "left", size = 3) +
   ggtitle("Country GDP by HAC Cluster") + xlab("Policy Cluster") + theme(legend.position = "none")
 dev.off()
-
-# ggrepel
-# deal with missing data
 ```
+
+```{r}
+jpeg(file="boxplot_k_gdp.jpg")
+ggplot(master_df_k, aes(x = cluster, y = log(GDP), fill = 
+                                                     cluster)) +
+  geom_boxplot(alpha = 0.3) +
+  geom_point(aes(color = cluster, group = cluster), position = position_dodge(width=0.75)) +
+  geom_text_repel(aes(group = cluster, 
+                label = ifelse(outlier_gdp, 
+                  yes = ISO3,
+                  no = '')), 
+            position = position_dodge(width=0.75),
+            hjust = "left", size = 3) +
+  ggtitle("Country GDP by HAC Cluster") + xlab("Policy Cluster") + theme(legend.position = "none")
+dev.off()
+```
+
 
 ```{r}
 jpeg(file = "boxplot_k_expectancy.jpg")
 ggplot(master_df_k, 
-       aes(x = cluster10, y = Expectancy, fill = cluster10)) +
+       aes(x = cluster, y = Expectancy, fill = cluster)) +
   geom_boxplot(alpha = 0.3) +
-  geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
-  geom_text_repel(aes(group = cluster10, 
+  geom_point(aes(color = cluster, group = cluster), position = position_dodge(width=0.75)) +
+  geom_text_repel(aes(group = cluster, 
                 label = ifelse(outlier_expectancy, 
                   yes = ISO3,
                   no = '')), 
@@ -872,10 +728,10 @@ dev.off()
 ## BOXPLOT QUESTIONS
 jpeg(file = "boxplot_h_expectancy.jpg")
 ggplot(master_df_h, 
-       aes(x = cluster10, y = Expectancy, fill = cluster10)) +
+       aes(x = cluster, y = Expectancy, fill = cluster)) +
   geom_boxplot(alpha = 0.3) +
-  geom_point(aes(color = cluster10, group = cluster10), position = position_dodge(width=0.75)) +
-  geom_text_repel(aes(group = cluster10, 
+  geom_point(aes(color = cluster, group = cluster), position = position_dodge(width=0.75)) +
+  geom_text_repel(aes(group = cluster, 
                 label = ifelse(outlier_expectancy, 
                   yes = ISO3,
                   no = '')), 
@@ -887,40 +743,29 @@ dev.off()
 
 
 ```{r}
+# extracting names of each country
 iso3$Alpha.3.code <- trimws(iso3$Alpha.3.code)
 names_h <- merge(master_df_h, iso3, by.x = "ISO3", by.y = "Alpha.3.code")
 names_k <- merge(master_df_k, iso3, by.x = "ISO3", by.y = "Alpha.3.code")
-countries_h <- data.frame()
-countries_k <- rep(NA, 10)
-for (i in 1:10) {
-  print(names_h[names_h$cluster10 == i, ]$Country)
-}
 ```
+
 ```{r}
 for (i in 1:10) {
-  print(names_h[names_h$cluster10 == i, ]$Country)
+  print(names_h[names_h$cluster == i, ]$Country)
 }
 ```
 
 
 ```{r}
 for (i in 1:10) {
-  print(names_k[names_k$cluster10 == i, ]$Country)
+  print(names_k[names_k$cluster == i, ]$Country)
 }
 ```
 
 ```{r}
 for (i in 1:10) {
-  print(names_k[names_k$cluster10 == i, ]$Country)
+  print(names_k[names_k$cluster == i, ]$Country)
 }
-```
-
-
-```{r}
-# trying to figure out how to format the above nicely into a table?
-#appendix (use xtable to format into Latex)
-# kableExtra
-tb <- split(master_df_k, master_df_k$cluster10)
 ```
 
 
@@ -936,21 +781,21 @@ FINAL OFFICE HOURS:
 - top two principal components, color code (or focusing on two variables of interest)
 
 ```{r}
-demographic_means <- aggregate(cbind(GDP, Pop, Expectancy, Fertility, literacy)~cluster10, 
+demographic_means <- aggregate(cbind(GDP, Pop, Expectancy, Fertility, literacy)~cluster, 
                                data = master_df_k, mean)
 demographic_means <- lapply(demographic_means, function(x) if(is.numeric(x)) round(x, 3) else x)
 demographic_means <- data.frame(demographic_means)
-names(demographic_means)[names(demographic_means) == 'cluster10'] <- 'cluster'
+names(demographic_means)[names(demographic_means) == 'cluster'] <- 'cluster'
 kable(demographic_means, "latex")
 ```
 
 ```{r}
-demographic_means <- aggregate(cbind(GDP, Pop, Expectancy, Fertility, literacy)~cluster10, 
+demographic_means <- aggregate(cbind(GDP, Pop, Expectancy, Fertility, literacy)~cluster, 
                                data = master_df_h, mean)
 demographic_means <- lapply(demographic_means, function(x) if(is.numeric(x)) round(x, 3) else x)
 demographic_means <- data.frame(demographic_means)
-names(demographic_means)[names(demographic_means) == 'cluster10'] <- 'cluster'
-kable(demographic_means, "latex")
+names(demographic_means)[names(demographic_means) == 'cluster'] <- 'cluster'
+xtable(demographic_means, "latex")
 ```
 
 ```{r}
@@ -959,14 +804,14 @@ cluster_means <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
                 CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_NON, 
                 POLICY_TYPE_COMPLETE, POLICY_TYPE_PARTIAL,
                 AIR, LAND, 
-                SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~cluster10, data = master_df_h, mean)
+                SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~cluster, data = master_df_h, mean)
 cluster_means <- lapply(cluster_means, function(x) if(is.numeric(x)) round(x, 3) else x)
 cluster_means <- data.frame(cluster_means)
-names(cluster_means)[names(cluster_means) == 'cluster10'] <- 'cluster'
-kable(cluster_means[,1:5], format = "latex")
-kable(cluster_means[,c(1,6:9)], format = "latex")
-kable(cluster_means[,c(1,10:13)], format = "latex")
-kable(cluster_means[,c(1,14:15)], format = "latex")
+names(cluster_means)[names(cluster_means) == 'cluster'] <- 'cluster'
+xtable(cluster_means[,1:5], format = "latex")
+xtable(cluster_means[,c(1,6:9)], format = "latex")
+xtable(cluster_means[,c(1,10:13)], format = "latex")
+xtable(cluster_means[,c(1,14:15)], format = "latex")
 ```
 
 
@@ -976,72 +821,14 @@ cluster_means <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
                 CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_NON, 
                 POLICY_TYPE_COMPLETE, POLICY_TYPE_PARTIAL,
                 AIR, LAND, 
-                SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~cluster10, data = master_df_k, mean)
+                SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~cluster, data = master_df_k, mean)
 cluster_means <- lapply(cluster_means, function(x) if(is.numeric(x)) round(x, 3) else x)
 cluster_means <- data.frame(cluster_means)
-names(cluster_means)[names(cluster_means) == 'cluster10'] <- 'cluster'
-kable(cluster_means[,1:5], format = "latex")
-kable(cluster_means[,c(1,6:9)], format = "latex")
-kable(cluster_means[,c(1,10:13)], format = "latex")
-kable(cluster_means[,c(1,14:15)], format = "latex")
-```
-
-```{r}
-# cluster 4 has longest policies
-# cluster 5 has strictest policies against refugees
-# cluster 6 has highest country exception list (and second highest work exception)
-```
-
-
-```{r}
-master_df_k[is.na(master_df_k$GDP),]
-# prob add into the original GDP data frame (so we have it in HAC too)
-# ABW -- 3202 x 10^6
-# AND -- 3155 x 10^6
-# ERI -- 2.07 bil (2011)
-# GIB -- 2,885,810,912.00
-# GRL -- 3052 x 10^6
-# LIE -- 6,839 x 10^6
-# MNP -- 1,182 x 10^6
-# NCL -- 10 bil
-# PYF -- 3.45 bil
-# SMR -- 1616 mil
-# SSD -- 1,119.7 mil
-# TKM -- 45231 mil
-# VEN -- 47.26 bil
-# YEM -- 23,486 mil
-```
-
-```{r}
-master_df_k[is.na(master_df_k$Expectancy),]
-# AND - 84.5
-# ASM - 73.32
-# CYM - 82.19
-# DMA - 76.6
-# GIB - 78.7
-# KNA - 71.34
-# MCO - 89.4
-# MHL - 65.24
-# MNP - 77.1
-# PLW - 69.13
-# SMR - 85.42
-# TCA - 80.6
-```
-
-```{r}
-master_df_k[is.na(master_df_k$Fertility),]
-# AND - 1.3
-# ASM - 2.28
-# CYM - 1.83
-# DMA - 1.9
-# GIB - 1.91
-# KNA - 2.1
-# MCO - 1.52
-# MHL - 4.5
-# MNP - 2.66
-# PLW - 2.21
-# SMR - 1.3
-# TCA - 1.7
+names(cluster_means)[names(cluster_means) == 'cluster'] <- 'cluster'
+xtable(cluster_means[,1:5], format = "latex")
+xtable(cluster_means[,c(1,6:9)], format = "latex")
+xtable(cluster_means[,c(1,10:13)], format = "latex")
+xtable(cluster_means[,c(1,14:15)], format = "latex")
 ```
 
 
@@ -1050,7 +837,7 @@ library(ggfortify)
 policy.pca <- prcomp(master_df_h[,2:ncol(by_country)], center = TRUE,scale. = TRUE)
 # summary(policy.pca)
 jpeg(file="pca_hac.jpg")
-g <- autoplot(policy.pca, data = master_df_h, colour = 'cluster10')
+g <- autoplot(policy.pca, data = master_df_h, colour = 'cluster')
 g + ggtitle('HAC Clustering on First Two Principal Components') + labs(colour = 'cluster')
 dev.off()
 ```
@@ -1059,7 +846,7 @@ dev.off()
 policy.pca <- prcomp(master_df_k[,2:ncol(by_country)], center = TRUE,scale. = TRUE)
 # summary(policy.pca)
 jpeg(file="pca_k.jpg")
-g <- autoplot(policy.pca, data = master_df_k, colour = 'cluster10')
+g <- autoplot(policy.pca, data = master_df_k, colour = 'cluster')
 g + ggtitle('K-Means Clustering on First Two Principal Components') + labs(colour = 'cluster')
 dev.off()
 ```
