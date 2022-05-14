@@ -101,7 +101,6 @@ mod_df[mod_df$POLICY_TYPE ==  "NOPOLICYIMPLEMENTED"
 ## HISTORY_BAN_LIST
 
 # for now, will count the number of commas
-# it would be interesting to explore whether certain countries are banned more often than others, but I feel like the variation is too large that this would not be a productive use of my time
 
 # helper function to determine the number of countries 
 # i.e., number of commas plus one
@@ -159,8 +158,33 @@ cleaned_df[ind] <- lapply(cleaned_df[ind], standardize)
 ```
 
 
+
 ```{r}
+
+by_country <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
+                              HISTORY_BAN_CLEANED,
+                              CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_NON, 
+                              POLICY_TYPE_COMPLETE, POLICY_TYPE_PARTIAL,
+                              AIR, LAND, 
+                              SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~ISO3, data = cleaned_df, mean)
+
+```
+
+
+```{r}
+summary(cleaned_df)
+new_vars <- c("VISA_BAN_NONE", "VISA_BAN_SPECIFIC", "VISA_BAN_ALL",
+          "HISTORY_BAN_CLEANED", "CITIZEN_LIST_CLEANED", "POLICY_LENGTH",
+          "POLICY_TYPE_COMPLETE", "POLICY_TYPE_PARTIAL", "AIR", "LAND", "SEA", 
+          "POLICY_TYPE_NON", "REFUGEE", "COUNTRY_EXCEP", "WORK_EXCEP")
+```
+
+```{r}
+## PHASE 3: SELECTING VARIABLES ##
+
 # report correlation matrix to see if any chosen variables are redundant:
+
+# helper function to export correlation matrix into latex table
 
 flattenCorrMatrix <- function(cormat, pmat) {
   ut <- upper.tri(cormat)
@@ -196,31 +220,11 @@ print(xtable(upper), type="latex")
 ```
 
 
-
-```{r}
-
-by_country <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
-                              HISTORY_BAN_CLEANED,
-                              CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_NON, 
-                              POLICY_TYPE_COMPLETE, POLICY_TYPE_PARTIAL,
-                              AIR, LAND, 
-                              SEA, REFUGEE, COUNTRY_EXCEP, WORK_EXCEP)~ISO3, data = cleaned_df, mean)
-
-```
-
-
-```{r}
-summary(cleaned_df)
-new_vars <- c("VISA_BAN_NONE", "VISA_BAN_SPECIFIC", "VISA_BAN_ALL",
-          "HISTORY_BAN_CLEANED", "CITIZEN_LIST_CLEANED", "POLICY_LENGTH",
-          "POLICY_TYPE_COMPLETE", "POLICY_TYPE_PARTIAL", "AIR", "LAND", "SEA", 
-          "POLICY_TYPE_NON", "REFUGEE", "COUNTRY_EXCEP", "WORK_EXCEP")
-```
-
-
 DETERMINING THE NUMBER OF CLUSTERS:
 
 ```{r}
+## PHASE 4: TUNING HYPER-PARAMETERS FOR CLUSTERING ##
+
 set.seed(98)
 gap_stat <- clusGap(by_country[,2:ncol(by_country)], kmeans, K.max = 10, B = 50)
 jpeg(file="gap_k.jpg")
@@ -284,6 +288,7 @@ cor(dist_mat,c8)
 ```
 
 ```{r}
+## PHASE 5 (AND FINAL PHASE): CREATING CLUSTERS AND ANALYZING
 # kmeans clustering
 set.seed(98)
 
@@ -291,7 +296,6 @@ cluster.results.6 <- kmeans(by_country[,2:ncol(by_country)], 6,nstart = 10)
 
 kcluster_by_country = data.frame(by_country)
 kcluster_by_country$cluster <- as.factor(cluster.results.6$cluster)
-# kcluster_by_country$cluster <- as.factor(cluster.results.6$cluster)
 ```
 
 
@@ -308,12 +312,10 @@ dev.off()
 cut_avg6 <- cutree(hclust_avg, k = 6)
 
 hcluster_by_country6 <- mutate(by_country, cluster = cut_avg6)
-# hcluster_by_country6 <- mutate(by_country, cluster = cut_avg6)
 
 hcluster_by_country <- data.frame(by_country)
 
 hcluster_by_country$cluster <- as.factor(hcluster_by_country6$cluster)
-# hcluster_by_country$cluster <- as.factor(hcluster_by_country6$cluster)
 ```
 
 ```{r}
@@ -374,8 +376,8 @@ fertility_rate[fertility_rate$Code == "TCA", ]$Fertility = 1.7
 
 
 ```{r}
-# some data cleaning on literacy rate -- need to note how not all of them were pulled from
-# 2020
+# some data cleaning on literacy rates
+
 literacy_rate <- merge(literacy_rate, iso3, by.x = "country", by.y = "Country")
 literacy_rate <- subset(literacy_rate, select = c(latestRate, Alpha.3.code))
 colnames(literacy_rate) <- c('literacy', 'Code')
@@ -398,7 +400,6 @@ master_df_h <- merge(master_df_h, life_expectancy, by.x = "ISO3", by.y = "Code")
 master_df_h <- merge(master_df_h, fertility_rate, by.x = "ISO3", by.y = "Code")
 master_df_h <- merge(master_df_h, literacy_rate, by.x = "ISO3", by.y = "Code")
 master_df_h <- subset(master_df_h, select = -c(Name.x, X.x, Name.y, X.y))
-
 ```
 
 
@@ -446,12 +447,10 @@ master_df_k_continent <- merge(master_df_k, continents, by.x = "ISO3", by.y = "c
 master_df_h_continent <- merge(master_df_h, continents, by.x = "ISO3", by.y = "code_3")
 ```
 
-HDI classifications are based on HDI fixed cutoff points, which are derived from the quartiles of dis- tributions of the component indicators. The cutoff-points are HDI of less than 0.550 for low human development, 0.550–0.699 for medium human development, 0.700–0.799 for high human development and 0.800 or greater for very high human development.
-
-https://hdr.undp.org/en/content/human-development-report-2020-readers-guide
-
 
 ```{r}
+# countries into development level by human demographic index, with these cutoffs: https://hdr.undp.org/en/content/human-development-report-2020-readers-guide
+
 hdi <- read.csv('data/demographic/hdi.csv')
 hdi <- merge(hdi, iso3, by.x = "country", by.y = "Country")
 hdi <- subset(hdi, select = c(hdi, Alpha.3.code))
@@ -469,6 +468,7 @@ master_df_h_hdi <- merge(master_df_h, hdi, by.x = "ISO3", by.y = "Code")
 
 
 ```{r}
+# compute rand index to compare different clusterings
 rand.index(as.numeric(levels(master_df_k_continent$cluster))[master_df_k_continent$cluster],
            master_df_k_continent$continent)
 rand.index(as.numeric(levels(master_df_h_continent$cluster))[master_df_h_continent$cluster],
@@ -495,6 +495,8 @@ rand.index(as.numeric(levels(master_df_h_hdi$cluster))[master_df_h_hdi$cluster],
 #  [8,] "Expectancy" "Fertility" 
 #  [9,] "Expectancy" "literacy"  
 # [10,] "Fertility"  "literacy"  
+
+# plot clusters on different demographic variables, in an attempt to see a pattern
 
 vars <- c("GDP", "Pop", "Expectancy", "Fertility", "literacy")
 pairs <- t(combn(vars, 2))
@@ -587,7 +589,7 @@ p2 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
 ```
 
 ```{r}
-# manually label outliers for boxplots
+# manually label outliers for boxplots, need variable that indicates whether that country is an outlier for its specific cluster
 
 master_df_k$outlier_expectancy <- rep(0, nrow(master_df_k))
 for (i in 1:10) {
@@ -641,8 +643,6 @@ for (i in 1:10) {
     (master_df_h[master_df_h$cluster == i, ]$literacy > med + 1.5 * iqr) |
     (master_df_h[master_df_h$cluster == i, ]$literacy < med - 1.5 * iqr)
 }
-
-
 ```
 
 
@@ -738,6 +738,8 @@ names_k <- merge(master_df_k, iso3, by.x = "ISO3", by.y = "Alpha.3.code")
 ```
 
 ```{r}
+# unfortunately could not find a better way to export countries into a table -- printing out the names of countries in each cluster
+
 for (i in 1:6) {
   print(names_h[names_h$cluster == i, ]$Country)
 }
@@ -745,6 +747,8 @@ for (i in 1:6) {
 
 
 ```{r}
+# unfortunately could not find a better way to export countries into a table -- printing out the names of countries in each cluster
+
 for (i in 1:6) {
   print(names_k[names_k$cluster == i, ]$Country)
 }
@@ -752,15 +756,14 @@ for (i in 1:6) {
 
 
 ```{r}
+# reporting demographic means for each cluster, in latex format
 demographic_means <- aggregate(cbind(GDP, Pop, Expectancy, Fertility, literacy)~cluster, 
                                data = master_df_k, mean)
 demographic_means <- lapply(demographic_means, function(x) if(is.numeric(x)) round(x, 3) else x)
 demographic_means <- data.frame(demographic_means)
 names(demographic_means)[names(demographic_means) == 'cluster'] <- 'cluster'
 kable(demographic_means, "latex")
-```
 
-```{r}
 demographic_means <- aggregate(cbind(GDP, Pop, Expectancy, Fertility, literacy)~cluster, 
                                data = master_df_h, mean)
 demographic_means <- lapply(demographic_means, function(x) if(is.numeric(x)) round(x, 3) else x)
@@ -770,6 +773,7 @@ xtable(demographic_means, "latex")
 ```
 
 ```{r}
+# reporting policy means for each cluster, in latex format
 cluster_means <- aggregate(cbind(VISA_BAN_NONE, VISA_BAN_SPECIFIC, VISA_BAN_ALL,
                 HISTORY_BAN_CLEANED,
                 CITIZEN_LIST_CLEANED, POLICY_LENGTH, POLICY_TYPE_NON, 
@@ -804,6 +808,7 @@ xtable(cluster_means[,c(1,14:15)], format = "latex")
 
 
 ```{r}
+# clusters on first two principal components, to justify structures of each cluster
 library(ggfortify)
 policy.pca <- prcomp(master_df_h[,2:ncol(by_country)], center = TRUE,scale. = TRUE)
 # summary(policy.pca)
