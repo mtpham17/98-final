@@ -750,35 +750,18 @@ names_k <- merge(master_df_k, iso3, by.x = "ISO3", by.y = "Alpha.3.code")
 ```
 
 ```{r}
-for (i in 1:10) {
+for (i in 1:6) {
   print(names_h[names_h$cluster == i, ]$Country)
 }
 ```
 
 
 ```{r}
-for (i in 1:10) {
+for (i in 1:6) {
   print(names_k[names_k$cluster == i, ]$Country)
 }
 ```
 
-```{r}
-for (i in 1:10) {
-  print(names_k[names_k$cluster == i, ]$Country)
-}
-```
-
-
-FINAL OFFICE HOURS:
-- moving the tables in the data section to the appendix?
-- standardized or original data summary statistics in the table? both?
-- telling a meaningful story with the scatter plot?
-- difficult drawing general conclusions -- don't seem like I have a ton of meaningful results :( -- or are there ways to find general, practical results that don't involve scoring / evaluating the different policies on ``strictness?''
-
-
-
-- classification tree, multinomial 
-- top two principal components, color code (or focusing on two variables of interest)
 
 ```{r}
 demographic_means <- aggregate(cbind(GDP, Pop, Expectancy, Fertility, literacy)~cluster, 
