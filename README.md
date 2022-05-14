@@ -5,7 +5,7 @@ This paper explores the clusterings of countries and territories, by their immig
 
 Relevant files:
 - data_analysis.Rmd for data cleaning and analysis code
-- PhamT\_FinalAssignment.pdf for the final writeup
-- Slide decks in ``presentations" for midpoint and final presentations
+- PhamT\_FinalAssignment.pdf for the final writeup, the most recent version of this investigation
+- Slide decks in ``presentations" for midpoint and final presentations (please note that the final presentation did not necessarily include final results, as it was over a week before the final write-up)
 - Plots in ``images" for all graphics generated in analysis
 - Raw CSVs in ``data" for all data sources used
