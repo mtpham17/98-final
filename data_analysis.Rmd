@@ -30,6 +30,8 @@ library(xtable)
 
 ```{r}
 # read in data, and summarize
+
+## PHASE 1: EXPLORING DATA ##
 data <- read.csv('data/immigration_policies/policy_list.csv')
 summary(data)
 
@@ -64,9 +66,9 @@ for (i in 1:length(colnames(mod_df))) {
 
 
 ```{r}
-# data cleaning for NA values, mostly one-hot encoding
+## PHASE 2: CLEANING DATA
 
-## VISA_BAN_LIST
+# data cleaning for NA values, mostly one-hot encoding, as we find that data is not missing at random
 
 colSums(is.na(mod_df))[colSums(is.na(mod_df)) != 0]
 
@@ -402,10 +404,7 @@ master_df_h <- subset(master_df_h, select = -c(Name.x, X.x, Name.y, X.y))
 
 
 ```{r}
-# anova stuff
-# histograms or boxplots -- distribution of these variables across these clusters change
-# for ones that are significant -- look for outliers!
-
+# anova 
 k_gdp <- aov(GDP ~ cluster, data = master_df_k)
 k_pop <- aov(Pop ~ cluster, data = master_df_k) 
 k_exp <- aov(Expectancy ~ cluster, data = master_df_k) 
@@ -433,12 +432,9 @@ summary(h_fert)
 summary(h_lit)
 ```
 
-https://gist.github.com/tadast/8827699
-https://worldpopulationreview.com/country-rankings/literacy-rate-by-country
-https://www.datanovia.com/en/lessons/determining-the-optimal-number-of-clusters-3-must-know-methods/
 
 ```{r}
-# need to merge continent and development level into the data
+# merge continent and development level into the data
 continents <- read.csv('data/demographic/continent.csv')
 continents <- subset(continents, select = c(continent, code_3))
 old <- c("Asia", "Europe", "Africa", "Oceania", "Americas")
@@ -544,14 +540,6 @@ p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
 p2 <- ggplot(master_df_k, aes(x = log(Fertility), y = log(literacy), color = cluster)) +
   geom_point(size=2)
 p2 + ggtitle("K-Means: 6 Clusters") + scale_fill_brewer(palette="Set3")
-
-#jpeg(file="kmeans_6.jpg")
-#dev.off()
-
-#jpeg(file="hac_6.jpg")
-# p3 <- ggplot(master_df_h, aes(x = log(Pop), y = log(Expectancy), color = cluster)) + geom_point(size=2) 
-# p3 + ggtitle("HAC: 6 Clusters") + scale_fill_brewer(palette="Set3")
-#dev.off()
 ```
 
 ```{r}
@@ -704,7 +692,7 @@ ggplot(master_df_k, aes(x = cluster, y = log(GDP), fill =
                   no = '')), 
             position = position_dodge(width=0.75),
             hjust = "left", size = 3) +
-  ggtitle("Country GDP by HAC Cluster") + xlab("Policy Cluster") + theme(legend.position = "none")
+  ggtitle("Country GDP by K-Means Cluster") + xlab("Policy Cluster") + theme(legend.position = "none")
 dev.off()
 ```
 
