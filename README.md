@@ -8,3 +8,4 @@ Relevant files:
 - PhamT\_FinalAssignment.pdf for the final writeup
 - Slide decks in ``presentations" for midpoint and final presentations
 - Plots in ``images" for all graphics generated in analysis
+- Raw CSVs in ``data" for all data sources used
